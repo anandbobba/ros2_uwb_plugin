@@ -1,0 +1,364 @@
+<?xml version="1.0" ?>
+<sdf version="1.7">
+  <world name="uwb_world">
+    <physics name="1ms" type="ignored">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <plugin
+      filename="libignition-gazebo-physics-system.so"
+      name="ignition::gazebo::systems::Physics">
+    </plugin>
+    <plugin
+      filename="libignition-gazebo-user-commands-system.so"
+      name="ignition::gazebo::systems::UserCommands">
+    </plugin>
+    <plugin
+      filename="libignition-gazebo-scene-broadcaster-system.so"
+      name="ignition::gazebo::systems::SceneBroadcaster">
+    </plugin>
+    <plugin
+      filename="libignition-gazebo-sensors-system.so"
+      name="ignition::gazebo::systems::Sensors">
+      <render_engine>ogre</render_engine>
+    </plugin>
+
+    <scene>
+      <ambient>1.0 1.0 1.0 1</ambient>
+      <background>0.8 0.8 0.8 1</background>
+      <grid>true</grid>
+    </scene>
+
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.8 0.8 0.8 1</ambient>
+            <diffuse>0.8 0.8 0.8 1</diffuse>
+            <specular>0.8 0.8 0.8 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- UWB Anchor 1 (Static Reference) -->
+    <model name="uwb_anchor_0">
+      <static>true</static>
+      <pose>5 5 2.0 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.05</radius>
+              <length>0.1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.2 0.2 0.2 1</ambient>
+            <diffuse>0.2 0.2 0.2 1</diffuse>
+          </material>
+        </visual>
+        <!-- Antenna Visual -->
+        <visual name="antenna">
+          <pose>0 0 0.08 0 0 0</pose>
+          <geometry><sphere><radius>0.02</radius></sphere></geometry>
+          <material><ambient>1 0 0 1</ambient><diffuse>1 0 0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- UWB Anchor 2 -->
+    <model name="uwb_anchor_1">
+      <static>true</static>
+      <pose>-5 5 2.0 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <cylinder><radius>0.05</radius><length>0.1</length></cylinder>
+          </geometry>
+          <material><ambient>0.2 0.2 0.2 1</ambient><diffuse>0.2 0.2 0.2 1</diffuse></material>
+        </visual>
+        <visual name="antenna">
+          <pose>0 0 0.08 0 0 0</pose>
+          <geometry><sphere><radius>0.02</radius></sphere></geometry>
+          <material><ambient>0 1 0 1</ambient><diffuse>0 1 0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- UWB Anchor 3 -->
+    <model name="uwb_anchor_2">
+      <static>true</static>
+      <pose>5 -5 2.0 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <cylinder><radius>0.05</radius><length>0.1</length></cylinder>
+          </geometry>
+          <material><ambient>0.2 0.2 0.2 1</ambient><diffuse>0.2 0.2 0.2 1</diffuse></material>
+        </visual>
+        <visual name="antenna">
+          <pose>0 0 0.08 0 0 0</pose>
+          <geometry><sphere><radius>0.02</radius></sphere></geometry>
+          <material><ambient>0 0 1 1</ambient><diffuse>0 0 1 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- UWB Anchor 4 -->
+    <model name="uwb_anchor_3">
+      <static>true</static>
+      <pose>-5 -5 2.0 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <cylinder><radius>0.05</radius><length>0.1</length></cylinder>
+          </geometry>
+          <material><ambient>0.2 0.2 0.2 1</ambient><diffuse>0.2 0.2 0.2 1</diffuse></material>
+        </visual>
+        <visual name="antenna">
+          <pose>0 0 0.08 0 0 0</pose>
+          <geometry><sphere><radius>0.02</radius></sphere></geometry>
+          <material><ambient>1 1 0 1</ambient><diffuse>1 1 0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Tag Robot (Mobile Entity) -->
+    <model name="tag_robot">
+      <pose>0 0 0.35 0 0 0</pose>
+      <link name="base_link">
+        <inertial>
+          <mass>1.5</mass>
+          <inertia>
+            <ixx>0.05</ixx><iyy>0.05</iyy><izz>0.05</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry><box><size>0.5 0.5 0.25</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.5 0.5 0.25</size></box></geometry>
+          <material>
+            <ambient>0 0.5 0.8 1</ambient>
+            <diffuse>0 0.5 0.8 1</diffuse>
+          </material>
+        </visual>
+      </link>
+
+      <!-- Left Wheel -->
+      <link name="left_wheel">
+        <pose>0 0.3 -0.1 -1.5707 0 0</pose>
+        <inertial>
+          <mass>0.5</mass>
+          <inertia>
+            <ixx>0.001</ixx><iyy>0.001</iyy><izz>0.001</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry><cylinder><radius>0.2</radius><length>0.1</length></cylinder></geometry>
+          <surface>
+            <friction>
+              <ode><mu>1.0</mu><mu2>1.0</mu2></ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry><cylinder><radius>0.2</radius><length>0.1</length></cylinder></geometry>
+          <material><ambient>0.2 0.2 0.2 1</ambient><diffuse>0.2 0.2 0.2 1</diffuse></material>
+        </visual>
+      </link>
+
+      <!-- Right Wheel -->
+      <link name="right_wheel">
+        <pose>0 -0.3 -0.1 -1.5707 0 0</pose>
+        <inertial>
+          <mass>0.5</mass>
+          <inertia>
+            <ixx>0.001</ixx><iyy>0.001</iyy><izz>0.001</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry><cylinder><radius>0.2</radius><length>0.1</length></cylinder></geometry>
+          <surface>
+            <friction>
+              <ode><mu>1.0</mu><mu2>1.0</mu2></ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry><cylinder><radius>0.2</radius><length>0.1</length></cylinder></geometry>
+          <material><ambient>0.2 0.2 0.2 1</ambient><diffuse>0.2 0.2 0.2 1</diffuse></material>
+        </visual>
+      </link>
+
+      <!-- Castor -->
+      <link name="castor">
+        <pose>0.2 0 -0.2 0 0 0</pose>
+        <collision name="collision">
+          <geometry><sphere><radius>0.1</radius></sphere></geometry>
+          <surface>
+            <friction>
+              <ode><mu>0</mu><mu2>0</mu2></ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry><sphere><radius>0.1</radius></sphere></geometry>
+          <material><ambient>0.2 0.2 0.2 1</ambient><diffuse>0.2 0.2 0.2 1</diffuse></material>
+        </visual>
+      </link>
+
+      <joint name="left_wheel_joint" type="revolute">
+        <parent>base_link</parent>
+        <child>left_wheel</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+        </axis>
+      </joint>
+
+      <joint name="right_wheel_joint" type="revolute">
+        <parent>base_link</parent>
+        <child>right_wheel</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+        </axis>
+      </joint>
+
+      <joint name="castor_joint" type="ball">
+        <parent>base_link</parent>
+        <child>castor</child>
+      </joint>
+
+      <!-- Diff Drive Plugin -->
+      <plugin
+        filename="libignition-gazebo-diff-drive-system.so"
+        name="ignition::gazebo::systems::DiffDrive">
+        <left_joint>left_wheel_joint</left_joint>
+        <right_joint>right_wheel_joint</right_joint>
+        <wheel_separation>0.6</wheel_separation>
+        <wheel_radius>0.2</wheel_radius>
+        <odom_publish_frequency>20</odom_publish_frequency>
+        <topic>/cmd_vel</topic>
+        <odom_topic>/odom</odom_topic>
+        <tf_topic>/model/tag_robot/tf</tf_topic>
+        <frame_id>odom</frame_id>
+        <child_frame_id>base_footprint</child_frame_id>
+        <publish_odom_tf>true</publish_odom_tf>
+      </plugin>
+
+      <!-- Joint State Publisher for Wheel Visualization -->
+      <plugin
+        filename="libignition-gazebo-joint-state-publisher-system.so"
+        name="ignition::gazebo::systems::JointStatePublisher">
+        <topic>/joint_states</topic>
+      </plugin>
+
+      <!-- Odometry Publisher for Ground Truth (Exact) -->
+      <plugin
+        filename="libignition-gazebo-odometry-publisher-system.so"
+        name="ignition::gazebo::systems::OdometryPublisher">
+        <odom_frame>map</odom_frame>
+        <robot_base_frame>base_footprint</robot_base_frame>
+        <odom_topic>/ground_truth/odom</odom_topic>
+        <tf_topic>/ground_truth/tf</tf_topic>
+        <publish_tf>false</publish_tf>
+        <update_frequency>50</update_frequency>
+      </plugin>
+
+      <!-- UWB Tag measuring against Anchor 0 -->
+      <plugin
+        filename="libUWBPlugin.so"
+        name="ros2_uwb_research_sim::UWBPlugin">
+        <target_entity>uwb_anchor_0</target_entity>
+        <target_position>5 5 2</target_position>
+        <update_rate>20.0</update_rate>
+        <gaussian_std>0.02</gaussian_std>
+        <nlos_lambda>1.5</nlos_lambda>
+        <nlos_prob>0.1</nlos_prob>
+        <multipath_alpha>0.8</multipath_alpha>
+        <multipath_std>0.01</multipath_std>
+        <clock_drift_std>0.0001</clock_drift_std>
+        <topic>/uwb/range_0</topic>
+        <research_topic>/uwb/research_data</research_topic>
+        <frame_id>uwb_anchor_0</frame_id>
+      </plugin>
+
+      <!-- UWB Tag measuring against Anchor 1 -->
+      <plugin
+        filename="libUWBPlugin.so"
+        name="ros2_uwb_research_sim::UWBPlugin">
+        <target_entity>uwb_anchor_1</target_entity>
+        <target_position>-5 5 2</target_position>
+        <update_rate>20.0</update_rate>
+        <gaussian_std>0.02</gaussian_std>
+        <nlos_lambda>1.5</nlos_lambda>
+        <nlos_prob>0.1</nlos_prob>
+        <multipath_alpha>0.8</multipath_alpha>
+        <multipath_std>0.01</multipath_std>
+        <clock_drift_std>0.0001</clock_drift_std>
+        <topic>/uwb/range_1</topic>
+        <research_topic>/uwb/research_data</research_topic>
+        <frame_id>uwb_anchor_1</frame_id>
+      </plugin>
+
+      <plugin
+        filename="libUWBPlugin.so"
+        name="ros2_uwb_research_sim::UWBPlugin">
+        <target_entity>uwb_anchor_2</target_entity>
+        <target_position>5 -5 2</target_position>
+        <update_rate>20.0</update_rate>
+        <gaussian_std>0.02</gaussian_std>
+        <nlos_lambda>1.5</nlos_lambda>
+        <nlos_prob>0.1</nlos_prob>
+        <multipath_alpha>0.8</multipath_alpha>
+        <multipath_std>0.01</multipath_std>
+        <clock_drift_std>0.0001</clock_drift_std>
+        <topic>/uwb/range_2</topic>
+        <research_topic>/uwb/research_data</research_topic>
+        <frame_id>uwb_anchor_2</frame_id>
+      </plugin>
+
+      <plugin
+        filename="libUWBPlugin.so"
+        name="ros2_uwb_research_sim::UWBPlugin">
+        <target_entity>uwb_anchor_3</target_entity>
+        <target_position>-5 -5 2</target_position>
+        <update_rate>20.0</update_rate>
+        <gaussian_std>0.02</gaussian_std>
+        <nlos_lambda>1.5</nlos_lambda>
+        <nlos_prob>0.1</nlos_prob>
+        <multipath_alpha>0.8</multipath_alpha>
+        <multipath_std>0.01</multipath_std>
+        <clock_drift_std>0.0001</clock_drift_std>
+        <topic>/uwb/range_3</topic>
+        <research_topic>/uwb/research_data</research_topic>
+        <frame_id>uwb_anchor_3</frame_id>
+      </plugin>
+    </model>
+
+    <gui fullscreen="0">
+      <camera name="user_camera">
+        <pose>12 -12 10 0 0.5 2.4</pose>
+        <view_controller>orbit</view_controller>
+      </camera>
+    </gui>
+
+  </world>
+</sdf>

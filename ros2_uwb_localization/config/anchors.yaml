@@ -1,0 +1,29 @@
+# =============================================================================
+# UWB Anchor Configuration
+# =============================================================================
+# Define anchor positions in the world frame (meters).
+# Minimum 3 anchors required for 2D trilateration, 4+ recommended.
+#
+# Each anchor must have:
+#   - id:       Unique string identifier (used for topic naming)
+#   - position: [x, y, z] in meters, world frame
+#
+# Topic convention: each anchor publishes to /uwb/range_{index}
+# where index is the order in this list (0, 1, 2, ...).
+#
+# Uses '/**' wildcard so all nodes receive these parameters.
+# =============================================================================
+
+/**:
+  ros__parameters:
+    anchors:
+      anchor_0: {id: "uwb_anchor_0", position: [5.0, 5.0, 2.0]}
+      anchor_1: {id: "uwb_anchor_1", position: [-5.0, 5.0, 2.0]}
+      anchor_2: {id: "uwb_anchor_2", position: [5.0, -5.0, 2.0]}
+      anchor_3: {id: "uwb_anchor_3", position: [-5.0, -5.0, 2.0]}
+
+    # Frame in which anchor positions are defined
+    world_frame: "map"
+
+    # Rate at which anchor TF transforms are broadcast (Hz)
+    broadcast_rate: 10.0

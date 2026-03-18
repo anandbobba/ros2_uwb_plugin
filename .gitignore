@@ -1,0 +1,18 @@
+# ROS2 build artifacts
+build/
+install/
+log/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Local config & IDE
+.vscode/
+.DS_Store
+
+# Research temporary data
+*.csv
+*.bag
+*.mcap
+/tmp/

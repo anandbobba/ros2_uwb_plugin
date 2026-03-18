@@ -1,0 +1,9 @@
+std_msgs/Header header
+string anchor_id
+float64 true_distance
+float64 measured_distance
+float64 gaussian_error
+float64 nlos_bias
+float64 multipath_error
+float64 clock_drift_error
+float64 total_error

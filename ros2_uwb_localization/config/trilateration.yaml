@@ -1,0 +1,25 @@
+# =============================================================================
+# Trilateration Node Configuration
+# =============================================================================
+
+/**:
+  ros__parameters:
+    # Frame settings
+    output_frame: "map"
+    base_frame: "base_link"
+
+    # Solver parameters
+    optimization_iterations: 15
+    convergence_threshold: 1.0e-5
+    min_anchors: 3
+
+    # Noise model
+    range_std_dev: 0.1          # Expected range measurement std dev (meters)
+
+    # Outlier rejection (NLOS detection)
+    outlier_threshold: 2.0      # Residual threshold for outlier rejection (meters)
+    outlier_iterations: 2       # Number of outlier rejection passes
+
+    # Timing
+    publish_rate: 20.0          # Output rate (Hz)
+    range_timeout: 3.0          # Anchor considered stale after this (seconds)

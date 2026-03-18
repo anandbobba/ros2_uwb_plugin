@@ -1,0 +1,16 @@
+--- CMakeLists.txt
++++ CMakeLists.txt
+@@ -99,6 +99,13 @@
+ if(BUILD_TESTING)
+   find_package(ament_cmake_gtest REQUIRED)
+   find_package(ament_lint_auto REQUIRED)
++  
++  # Restrict linters to source directories (prevents linting generated files in build/)
++  set(ament_cmake_copyright_FOUND TRUE)
++  set(ament_cmake_cpplint_FOUND TRUE)
++  set(ament_cmake_uncrustify_FOUND TRUE)
++  ament_copyright(src include test launch)
++  ament_cpplint(src include test)
++  ament_uncrustify(src include test)
++
+   ament_lint_auto_find_test_dependencies()

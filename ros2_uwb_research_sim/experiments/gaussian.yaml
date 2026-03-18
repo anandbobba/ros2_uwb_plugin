@@ -1,0 +1,8 @@
+experiment:
+  name: "pure_gaussian"
+  duration: 30
+params:
+  gaussian_std: 0.05
+  nlos_prob: 0.0
+  multipath_alpha: 0.0
+  clock_drift_std: 0.0

@@ -1,0 +1,332 @@
+<?xml version="1.0"?>
+<!--
+  UWB Localization Demo World
+  ============================
+  A simple indoor environment with 4 UWB anchors at known positions
+  and a differential-drive robot equipped with UWB tag sensors.
+
+  Anchor layout (top view):
+
+    A1 (-5,5,2) -------- A0 (5,5,2)
+         |                    |
+         |      Robot (0,0)   |
+         |                    |
+    A3 (-5,-5,2) ------- A2 (5,-5,2)
+
+  This world is designed to work with ros2_uwb_localization and
+  ros2_uwb_research_sim packages.
+-->
+<sdf version="1.8">
+  <world name="uwb_demo_world">
+
+    <!-- Physics -->
+    <physics name="1ms" type="ode">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <!-- Scene -->
+    <scene>
+      <ambient>0.4 0.4 0.4 1</ambient>
+      <background>0.7 0.8 0.9 1</background>
+      <shadows>true</shadows>
+    </scene>
+
+    <!-- Plugins -->
+    <plugin filename="ignition-gazebo-physics-system" name="ignition::gazebo::systems::Physics"/>
+    <plugin filename="ignition-gazebo-user-commands-system" name="ignition::gazebo::systems::UserCommands"/>
+    <plugin filename="ignition-gazebo-scene-broadcaster-system" name="ignition::gazebo::systems::SceneBroadcaster"/>
+
+    <!-- Sun -->
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <!-- Ground Plane -->
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane><normal>0 0 1</normal><size>100 100</size></plane>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <plane><normal>0 0 1</normal><size>100 100</size></plane>
+          </geometry>
+          <material>
+            <ambient>0.8 0.8 0.8 1</ambient>
+            <diffuse>0.8 0.8 0.8 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ================================================================= -->
+    <!-- UWB Anchor 0: (5, 5, 2) — Red -->
+    <!-- ================================================================= -->
+    <model name="uwb_anchor_0">
+      <static>true</static>
+      <pose>5 5 2 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.1 0.1 0.3</size></box></geometry>
+          <material>
+            <ambient>1 0.2 0.2 1</ambient>
+            <diffuse>1 0.2 0.2 1</diffuse>
+          </material>
+        </visual>
+      </link>
+      <!-- UWB Plugin: measures distance to tag_robot -->
+      <plugin filename="libUWBPlugin.so" name="ros2_uwb_research_sim::UWBPlugin">
+        <target_entity>tag_robot</target_entity>
+        <update_rate>20.0</update_rate>
+        <gaussian_std>0.02</gaussian_std>
+        <nlos_lambda>1.5</nlos_lambda>
+        <nlos_prob>0.1</nlos_prob>
+        <multipath_alpha>0.8</multipath_alpha>
+        <multipath_std>0.01</multipath_std>
+        <clock_drift_std>0.0001</clock_drift_std>
+        <topic>/uwb/range_0</topic>
+        <frame_id>uwb_anchor_0</frame_id>
+      </plugin>
+    </model>
+
+    <!-- ================================================================= -->
+    <!-- UWB Anchor 1: (-5, 5, 2) — Green -->
+    <!-- ================================================================= -->
+    <model name="uwb_anchor_1">
+      <static>true</static>
+      <pose>-5 5 2 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.1 0.1 0.3</size></box></geometry>
+          <material>
+            <ambient>0.2 0.8 0.2 1</ambient>
+            <diffuse>0.2 0.8 0.2 1</diffuse>
+          </material>
+        </visual>
+      </link>
+      <plugin filename="libUWBPlugin.so" name="ros2_uwb_research_sim::UWBPlugin">
+        <target_entity>tag_robot</target_entity>
+        <update_rate>20.0</update_rate>
+        <gaussian_std>0.02</gaussian_std>
+        <nlos_lambda>1.5</nlos_lambda>
+        <nlos_prob>0.1</nlos_prob>
+        <multipath_alpha>0.8</multipath_alpha>
+        <multipath_std>0.01</multipath_std>
+        <clock_drift_std>0.0001</clock_drift_std>
+        <topic>/uwb/range_1</topic>
+        <frame_id>uwb_anchor_1</frame_id>
+      </plugin>
+    </model>
+
+    <!-- ================================================================= -->
+    <!-- UWB Anchor 2: (5, -5, 2) — Blue -->
+    <!-- ================================================================= -->
+    <model name="uwb_anchor_2">
+      <static>true</static>
+      <pose>5 -5 2 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.1 0.1 0.3</size></box></geometry>
+          <material>
+            <ambient>0.2 0.4 1 1</ambient>
+            <diffuse>0.2 0.4 1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+      <plugin filename="libUWBPlugin.so" name="ros2_uwb_research_sim::UWBPlugin">
+        <target_entity>tag_robot</target_entity>
+        <update_rate>20.0</update_rate>
+        <gaussian_std>0.02</gaussian_std>
+        <nlos_lambda>1.5</nlos_lambda>
+        <nlos_prob>0.1</nlos_prob>
+        <multipath_alpha>0.8</multipath_alpha>
+        <multipath_std>0.01</multipath_std>
+        <clock_drift_std>0.0001</clock_drift_std>
+        <topic>/uwb/range_2</topic>
+        <frame_id>uwb_anchor_2</frame_id>
+      </plugin>
+    </model>
+
+    <!-- ================================================================= -->
+    <!-- UWB Anchor 3: (-5, -5, 2) — Yellow -->
+    <!-- ================================================================= -->
+    <model name="uwb_anchor_3">
+      <static>true</static>
+      <pose>-5 -5 2 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.1 0.1 0.3</size></box></geometry>
+          <material>
+            <ambient>1 0.8 0 1</ambient>
+            <diffuse>1 0.8 0 1</diffuse>
+          </material>
+        </visual>
+      </link>
+      <plugin filename="libUWBPlugin.so" name="ros2_uwb_research_sim::UWBPlugin">
+        <target_entity>tag_robot</target_entity>
+        <update_rate>20.0</update_rate>
+        <gaussian_std>0.02</gaussian_std>
+        <nlos_lambda>1.5</nlos_lambda>
+        <nlos_prob>0.1</nlos_prob>
+        <multipath_alpha>0.8</multipath_alpha>
+        <multipath_std>0.01</multipath_std>
+        <clock_drift_std>0.0001</clock_drift_std>
+        <topic>/uwb/range_3</topic>
+        <frame_id>uwb_anchor_3</frame_id>
+      </plugin>
+    </model>
+
+    <!-- ================================================================= -->
+    <!-- Mobile Robot (UWB Tag) -->
+    <!-- ================================================================= -->
+    <model name="tag_robot">
+      <pose>0 0 0.175 0 0 0</pose>
+
+      <!-- Chassis -->
+      <link name="base_link">
+        <inertial>
+          <mass>5.0</mass>
+          <inertia>
+            <ixx>0.1</ixx><iyy>0.1</iyy><izz>0.15</izz>
+          </inertia>
+        </inertial>
+        <visual name="visual">
+          <geometry><box><size>0.5 0.4 0.15</size></box></geometry>
+          <material>
+            <ambient>0.2 0.2 0.6 1</ambient>
+            <diffuse>0.2 0.2 0.6 1</diffuse>
+          </material>
+        </visual>
+        <collision name="collision">
+          <geometry><box><size>0.5 0.4 0.15</size></box></geometry>
+        </collision>
+      </link>
+
+      <!-- Left Wheel -->
+      <link name="left_wheel">
+        <pose>0 0.225 -0.05 -1.5708 0 0</pose>
+        <inertial>
+          <mass>0.5</mass>
+          <inertia>
+            <ixx>0.001</ixx><iyy>0.001</iyy><izz>0.002</izz>
+          </inertia>
+        </inertial>
+        <visual name="visual">
+          <geometry><cylinder><radius>0.125</radius><length>0.05</length></cylinder></geometry>
+          <material>
+            <ambient>0.1 0.1 0.1 1</ambient>
+            <diffuse>0.1 0.1 0.1 1</diffuse>
+          </material>
+        </visual>
+        <collision name="collision">
+          <geometry><cylinder><radius>0.125</radius><length>0.05</length></cylinder></geometry>
+          <surface>
+            <friction><ode><mu>1.0</mu><mu2>1.0</mu2></ode></friction>
+          </surface>
+        </collision>
+      </link>
+
+      <!-- Right Wheel -->
+      <link name="right_wheel">
+        <pose>0 -0.225 -0.05 -1.5708 0 0</pose>
+        <inertial>
+          <mass>0.5</mass>
+          <inertia>
+            <ixx>0.001</ixx><iyy>0.001</iyy><izz>0.002</izz>
+          </inertia>
+        </inertial>
+        <visual name="visual">
+          <geometry><cylinder><radius>0.125</radius><length>0.05</length></cylinder></geometry>
+          <material>
+            <ambient>0.1 0.1 0.1 1</ambient>
+            <diffuse>0.1 0.1 0.1 1</diffuse>
+          </material>
+        </visual>
+        <collision name="collision">
+          <geometry><cylinder><radius>0.125</radius><length>0.05</length></cylinder></geometry>
+          <surface>
+            <friction><ode><mu>1.0</mu><mu2>1.0</mu2></ode></friction>
+          </surface>
+        </collision>
+      </link>
+
+      <!-- Caster -->
+      <link name="caster">
+        <pose>-0.2 0 -0.1 0 0 0</pose>
+        <inertial>
+          <mass>0.2</mass>
+          <inertia>
+            <ixx>0.0001</ixx><iyy>0.0001</iyy><izz>0.0001</izz>
+          </inertia>
+        </inertial>
+        <visual name="visual">
+          <geometry><sphere><radius>0.05</radius></sphere></geometry>
+          <material>
+            <ambient>0.3 0.3 0.3 1</ambient>
+            <diffuse>0.3 0.3 0.3 1</diffuse>
+          </material>
+        </visual>
+        <collision name="collision">
+          <geometry><sphere><radius>0.05</radius></sphere></geometry>
+          <surface>
+            <friction><ode><mu>0.0</mu><mu2>0.0</mu2></ode></friction>
+          </surface>
+        </collision>
+      </link>
+
+      <!-- Joints -->
+      <joint name="left_wheel_joint" type="revolute">
+        <parent>base_link</parent>
+        <child>left_wheel</child>
+        <axis><xyz>0 0 1</xyz></axis>
+      </joint>
+      <joint name="right_wheel_joint" type="revolute">
+        <parent>base_link</parent>
+        <child>right_wheel</child>
+        <axis><xyz>0 0 1</xyz></axis>
+      </joint>
+      <joint name="caster_joint" type="ball">
+        <parent>base_link</parent>
+        <child>caster</child>
+      </joint>
+
+      <!-- Differential Drive -->
+      <plugin filename="ignition-gazebo-diff-drive-system"
+              name="ignition::gazebo::systems::DiffDrive">
+        <left_joint>left_wheel_joint</left_joint>
+        <right_joint>right_wheel_joint</right_joint>
+        <wheel_separation>0.45</wheel_separation>
+        <wheel_radius>0.125</wheel_radius>
+        <max_linear_acceleration>1.0</max_linear_acceleration>
+        <max_angular_acceleration>2.0</max_angular_acceleration>
+        <odom_publish_frequency>20</odom_publish_frequency>
+        <topic>cmd_vel</topic>
+      </plugin>
+
+      <!-- Joint State Publisher -->
+      <plugin filename="ignition-gazebo-joint-state-publisher-system"
+              name="ignition::gazebo::systems::JointStatePublisher">
+        <joint_name>left_wheel_joint</joint_name>
+        <joint_name>right_wheel_joint</joint_name>
+      </plugin>
+
+      <!-- Pose Publisher (for odometry + TF) -->
+      <plugin filename="ignition-gazebo-pose-publisher-system"
+              name="ignition::gazebo::systems::PosePublisher">
+        <publish_link_pose>true</publish_link_pose>
+        <publish_nested_model_pose>false</publish_nested_model_pose>
+        <use_pose_vector_msg>true</use_pose_vector_msg>
+        <publish_model_pose>false</publish_model_pose>
+      </plugin>
+    </model>
+
+  </world>
+</sdf>

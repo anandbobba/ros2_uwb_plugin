@@ -1,0 +1,12 @@
+# Default configuration for ROS2 UWB Research Sim
+uwb_plugin:
+  ros__parameters:
+    update_rate: 20.0
+    gaussian_std: 0.1
+    nlos_lambda: 1.5
+    nlos_prob: 0.2
+    multipath_alpha: 0.85
+    multipath_std: 0.05
+    clock_drift_std: 0.002
+    target_entity: "anchor_robot"
+    topic: "/uwb/range"

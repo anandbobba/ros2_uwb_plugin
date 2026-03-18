@@ -1,0 +1,17 @@
+# Environment Profile: Small Indoor (low multipath, low noise)
+# Target: Laboratories, small offices (< 10m range)
+uwb_range_preprocessor:
+  ros__parameters:
+    min_rssi: -85.0
+    range_timeout: 0.3
+    publish_rate: 20.0
+
+uwb_trilateration_solver:
+  ros__parameters:
+    range_std_dev: 0.05
+    outlier_threshold: 0.5
+    optimization_iterations: 10
+
+ekf_filter_node:
+  ros__parameters:
+    process_noise_covariance: [0.01, ..., 0.01] # (Truncated for readability, standard low noise)

@@ -1,0 +1,21 @@
+/**:
+  ros__parameters:
+    # -------------------------------------------------------------------------
+    # Solver Parameters
+    # -------------------------------------------------------------------------
+    optimization_iterations: 15
+    convergence_threshold: 1.0e-5
+    range_std_dev: 0.1
+    outlier_threshold: 1.5
+    outlier_iterations: 3
+    min_anchors: 3
+    output_frame: "map"
+
+    # -------------------------------------------------------------------------
+    # Preprocessor Parameters
+    # -------------------------------------------------------------------------
+    publish_rate: 20.0
+    range_timeout: 0.5
+    min_range: 0.0
+    max_range: 100.0
+    base_frame: "uwb_base"
