@@ -23,7 +23,7 @@ def generate_launch_description():
             PathJoinSubstitution([pkg_loc, 'launch', 'demo.launch.py'])
         ]),
         launch_arguments={
-            'rviz': rviz,
+            'launch_rviz': rviz,
             'use_sim_time': 'true'
         }.items()
     )

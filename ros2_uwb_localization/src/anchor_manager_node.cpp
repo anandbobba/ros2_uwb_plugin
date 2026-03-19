@@ -145,8 +145,10 @@ void AnchorManagerNode::broadcast_transforms()
 int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
-  auto node = std::make_shared<ros2_uwb_localization::AnchorManagerNode>();
-  rclcpp::spin(node);
+  {
+    auto node = std::make_shared<ros2_uwb_localization::AnchorManagerNode>();
+    rclcpp::spin(node);
+  }
   rclcpp::shutdown();
   return 0;
 }

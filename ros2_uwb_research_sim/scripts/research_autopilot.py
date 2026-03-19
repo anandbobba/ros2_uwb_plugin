@@ -28,8 +28,12 @@ def main(args=None):
         rclpy.spin(node)
     except KeyboardInterrupt:
         pass
-    node.destroy_node()
-    rclpy.shutdown()
+    try:
+        node.destroy_node()
+        if rclpy.ok():
+            rclpy.shutdown()
+    except (KeyboardInterrupt, Exception):
+        pass
 
 if __name__ == '__main__':
     main()

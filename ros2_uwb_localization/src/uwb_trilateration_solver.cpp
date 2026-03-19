@@ -285,8 +285,10 @@ void TrilaterationSolver::publish_pose(
 int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
-  auto node = std::make_shared<ros2_uwb_localization::TrilaterationSolver>();
-  rclcpp::spin(node);
+  {
+    auto node = std::make_shared<ros2_uwb_localization::TrilaterationSolver>();
+    rclcpp::spin(node);
+  }
   rclcpp::shutdown();
   return 0;
 }

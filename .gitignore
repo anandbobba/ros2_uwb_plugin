@@ -11,8 +11,12 @@ __pycache__/
 .vscode/
 .DS_Store
 
-# Research temporary data
+# Research temporary data & Large files
 *.csv
 *.bag
+*.db3
+*.sqlite3
 *.mcap
+uwb_dataset_*/
+my_uwb_demo_bag/
 /tmp/

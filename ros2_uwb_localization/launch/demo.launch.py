@@ -1,8 +1,8 @@
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, ExecuteProcess
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, ExecuteProcess, LogInfo
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution, PythonExpression
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
@@ -17,8 +17,13 @@ def generate_launch_description():
         'use_sim_time',
         default_value='true',
         description='Use simulation (Gazebo) clock if true')
-    use_sim_time = LaunchConfiguration('use_sim_time') # This will now refer to the declared argument
-    run_rviz = LaunchConfiguration('rviz', default='true')
+    declare_rviz = DeclareLaunchArgument(
+        'launch_rviz',
+        default_value='true',
+        description='Run RViz visualization if true')
+    
+    use_sim_time = LaunchConfiguration('use_sim_time')
+    run_rviz = LaunchConfiguration('launch_rviz')
 
     # 1. Simulation (Gazebo)
     # This includes the robot, world, and UWB plugin
@@ -102,6 +107,8 @@ def generate_launch_description():
     )
 
     ld.add_action(declare_use_sim_time)
+    ld.add_action(declare_rviz)
+    ld.add_action(LogInfo(msg=["Launch Argument 'launch_rviz' is: ", run_rviz]))
     ld.add_action(sim_launch)
     ld.add_action(anchor_manager)
     ld.add_action(preprocessor)

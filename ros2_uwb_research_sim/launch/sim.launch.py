@@ -94,16 +94,16 @@ def generate_launch_description():
             arguments=[
                 '/cmd_vel@geometry_msgs/msg/Twist@ignition.msgs.Twist',
                 '/odom@nav_msgs/msg/Odometry[ignition.msgs.Odometry',
+                '/ground_truth/odom@nav_msgs/msg/Odometry[ignition.msgs.Odometry',
                 '/model/tag_robot/tf@tf2_msgs/msg/TFMessage[ignition.msgs.Pose_V',
                 '/model/tag_robot/joint_state@sensor_msgs/msg/JointState[ignition.msgs.Model',
                 '/world/uwb_world/clock@rosgraph_msgs/msg/Clock[ignition.msgs.Clock',
-                '/odom@nav_msgs/msg/Odometry[ignition.msgs.Odometry',
             ],
             remappings=[
                 ('/world/uwb_world/clock', '/clock'),
                 ('/model/tag_robot/tf', '/tf'),
                 ('/model/tag_robot/joint_state', '/joint_states'),
-                ('/odom', '/ground_truth/pose'),
+                ('/ground_truth/odom', '/ground_truth/pose'),
             ],
             parameters=[{'use_sim_time': LaunchConfiguration('use_sim_time')}],
             output='screen'

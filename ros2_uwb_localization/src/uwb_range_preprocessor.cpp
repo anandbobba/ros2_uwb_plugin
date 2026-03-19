@@ -121,8 +121,10 @@ void RangePreprocessor::range_callback(const ros2_uwb_msgs::msg::UWBRange::Share
 int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
-  auto node = std::make_shared<ros2_uwb_localization::RangePreprocessor>();
-  rclcpp::spin(node);
+  {
+    auto node = std::make_shared<ros2_uwb_localization::RangePreprocessor>();
+    rclcpp::spin(node);
+  }
   rclcpp::shutdown();
   return 0;
 }

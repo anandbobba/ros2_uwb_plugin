@@ -35,6 +35,11 @@
   <!-- Config loading -->
   <depend>yaml-cpp</depend>
 
+  <!-- Research dependencies -->
+  <exec_depend>python3-matplotlib</exec_depend>
+  <exec_depend>python3-pandas</exec_depend>
+  <exec_depend>python3-numpy</exec_depend>
+
   <!-- Demo dependencies (optional) -->
   <exec_depend>rviz2</exec_depend>
   <exec_depend>ros_gz_bridge</exec_depend>

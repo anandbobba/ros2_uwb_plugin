@@ -24,13 +24,20 @@ A modular, production-grade UWB (Ultra-Wideband) localization ecosystem for ROS2
   - Automated CSV dataset logging and ROS bag integration.
   - Python scripts for RMSE, MAE, and P95 precision analysis.
 - **Ease of Use**: Unified launch system with automatic robot autopilot.
+- **Dependency Installer**: One-script setup for all system and ROS2 dependencies.
+
+---
+
+## 🎥 Demo
+
+[▶️ Watch the ROS2 UWB Framework in Action](https://drive.google.com/drive/folders/156ZFzQYNlvvF9lHqF-TpCHE53OlKgoRr?usp=drive_link)
 
 ---
 
 ## 📐 Architecture
 
 ```text
-       [ GAZIBO SIMULATION ]             [ LOCALIZATION PIPELINE ]
+       [ GAZEBO SIMULATION ]             [ LOCALIZATION PIPELINE ]
       +---------------------+           +--------------------------+
       |  UWB Plugin (Tag)   |           |  UWB Range Preprocessor  |
       |  (Noise + NLOS)     |           |  (Outlier Filtering)     |
@@ -53,11 +60,17 @@ A modular, production-grade UWB (Ultra-Wideband) localization ecosystem for ROS2
 
 ## 🚀 Quick Start
 
-### 1. Build the Workspace
+### 1. Set Up the Environment
 ```bash
-mkdir -p ~/uwb_ws/src && cd ~/uwb_ws/src
-git clone https://github.com/your-username/ros2_uwb_framework.git .
+mkdir -p ~/ros2_uwb_ws/src && cd ~/ros2_uwb_ws/src
+git clone https://github.com/anandbobba/ros2_uwb_plugin.git .
 cd ..
+
+# Install all binary and system dependencies automatically
+chmod +x src/install_dependencies.sh
+./src/install_dependencies.sh
+
+# Build
 colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
 source install/setup.bash
 ```
@@ -69,6 +82,11 @@ ros2 launch ros2_uwb_research_sim demo.launch.py
 ```
 *(Inside Gazebo, click the "Play" button. The robot will start circular motion immediately.)*
 
+### 3. Performance Mode (Recommended)
+If your system experiences lag or "Jump in time" warnings, run in **Headless Mode** (Server only + RViz). This is 10x more stable for long-term research data collection:
+```bash
+ros2 launch ros2_uwb_research_sim demo.launch.py gazebo_gui:=false
+```
 ---
 
 ## 📊 Research Workflow
@@ -83,10 +101,10 @@ ros2 launch ros2_uwb_localization record_dataset.launch.py
 Once recorded, generate performance plots and error attribution reports:
 ```bash
 # General performance (RMSE/Trajectory)
-python3 src/ros2_uwb_localization/scripts/plot_results.py <dataset>.csv
+python3 ros2_uwb_localization/scripts/plot_results.py <dataset>.csv
 
 # Research diagnostics (NLOS/Correlation)
-python3 src/ros2_uwb_localization/scripts/plot_diagnostics.py <dataset>.csv
+python3 ros2_uwb_localization/scripts/plot_diagnostics.py <dataset>.csv
 ```
 
 ### Dynamic Noise Profiles

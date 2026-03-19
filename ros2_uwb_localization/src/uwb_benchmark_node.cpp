@@ -62,47 +62,48 @@ public:
     RCLCPP_INFO(this->get_logger(), "Benchmarking node started. Logging to %s", log_file_path_.c_str());
   }
 
-  ~BenchmarkNode()
+  void generate_final_report()
   {
-    if (!errors_.empty()) {
-      double rmse = std::sqrt(std::accumulate(errors_.begin(), errors_.end(), 0.0, 
-        [](double a, double b) { return a + b * b; }) / errors_.size());
-      double mae = std::accumulate(errors_.begin(), errors_.end(), 0.0, 
-        [](double a, double b) { return a + std::abs(b); }) / errors_.size();
+    if (errors_.empty()) return;
+
+    double rmse = std::sqrt(std::accumulate(errors_.begin(), errors_.end(), 0.0, 
+      [](double a, double b) { return a + b * b; }) / errors_.size());
+    double mae = std::accumulate(errors_.begin(), errors_.end(), 0.0, 
+      [](double a, double b) { return a + std::abs(b); }) / errors_.size();
+    
+    std::vector<double> sorted_errors = errors_;
+    std::sort(sorted_errors.begin(), sorted_errors.end());
+    double p95 = sorted_errors[static_cast<size_t>(sorted_errors.size() * 0.95)];
+
+    std::cout << "\n--- UWB Benchmark Results ---\n";
+    std::cout << "  Samples : " << errors_.size() << "\n";
+    std::cout << "  RMSE    : " << rmse << " m\n";
+    std::cout << "  MAE     : " << mae << " m\n";
+    std::cout << "  P95     : " << p95 << " m\n";
+
+    if (diag_count_ > 0) {
+      double total_abs_err = total_gaussian_ + total_nlos_ + total_multipath_ + total_drift_;
+      std::cout << "\n--- Error Attribution --- \n";
+      std::cout << "  Gaussian  : " << (total_gaussian_ / total_abs_err) * 100.0 << "%\n";
+      std::cout << "  NLOS Bias : " << (total_nlos_ / total_abs_err) * 100.0 << "%\n";
+      std::cout << "  Multipath : " << (total_multipath_ / total_abs_err) * 100.0 << "%\n";
+      std::cout << "  ClockDrift: " << (total_drift_ / total_abs_err) * 100.0 << "%\n";
+      std::cout << "  NLOS Rate : " << (static_cast<double>(nlos_events_) / diag_count_) * 100.0 << "%\n";
       
-      std::vector<double> sorted_errors = errors_;
-      std::sort(sorted_errors.begin(), sorted_errors.end());
-      double p95 = sorted_errors[static_cast<size_t>(sorted_errors.size() * 0.95)];
-
-      std::cout << "\n--- UWB Benchmark Results ---\n";
-      std::cout << "  Samples : " << errors_.size() << "\n";
-      std::cout << "  RMSE    : " << rmse << " m\n";
-      std::cout << "  MAE     : " << mae << " m\n";
-      std::cout << "  P95     : " << p95 << " m\n";
-
-      if (diag_count_ > 0) {
-        double total_abs_err = total_gaussian_ + total_nlos_ + total_multipath_ + total_drift_;
-        std::cout << "\n--- Error Attribution --- \n";
-        std::cout << "  Gaussian  : " << (total_gaussian_ / total_abs_err) * 100.0 << "%\n";
-        std::cout << "  NLOS Bias : " << (total_nlos_ / total_abs_err) * 100.0 << "%\n";
-        std::cout << "  Multipath : " << (total_multipath_ / total_abs_err) * 100.0 << "%\n";
-        std::cout << "  ClockDrift: " << (total_drift_ / total_abs_err) * 100.0 << "%\n";
-        std::cout << "  NLOS Rate : " << (static_cast<double>(nlos_events_) / diag_count_) * 100.0 << "%\n";
-        
-        // Simple lag-1 autocorrelation for multipath
-        if (multipath_series_.size() > 1) {
-           double mean = total_multipath_ / multipath_series_.size();
-           double num = 0, den = 0;
-           for(size_t i=0; i < multipath_series_.size()-1; ++i) {
-             num += (multipath_series_[i] - mean) * (multipath_series_[i+1] - mean);
-             den += (multipath_series_[i] - mean) * (multipath_series_[i] - mean);
-           }
-           std::cout << "  Multipath Correlation (lag-1): " << (den > 0 ? num/den : 0) << "\n";
-        }
+      if (multipath_series_.size() > 1) {
+          double mean = total_multipath_ / multipath_series_.size();
+          double num = 0, den = 0;
+          for(size_t i=0; i < multipath_series_.size()-1; ++i) {
+            num += (multipath_series_[i] - mean) * (multipath_series_[i+1] - mean);
+            den += (multipath_series_[i] - mean) * (multipath_series_[i] - mean);
+          }
+          std::cout << "  Multipath Correlation (lag-1): " << (den > 0 ? num/den : 0) << "\n";
       }
-      std::cout << "-----------------------------\n";
     }
+    std::cout << "-----------------------------\n";
   }
+
+  ~BenchmarkNode() = default;
 
 private:
   void gt_callback(const nav_msgs::msg::Odometry::SharedPtr msg)
@@ -172,6 +173,8 @@ int main(int argc, char ** argv)
   rclcpp::init(argc, argv);
   auto node = std::make_shared<ros2_uwb_localization::BenchmarkNode>();
   rclcpp::spin(node);
+  node->generate_final_report();
+  node.reset();
   rclcpp::shutdown();
   return 0;
 }
