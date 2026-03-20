@@ -9,7 +9,7 @@
     fusion (UWB + odometry + IMU), and RViz visualization. Designed for
     Gazebo/Ignition simulation and real hardware.
   </description>
-  <maintainer email="anand@example.com">Anand Bobba</maintainer>
+  <maintainer email="anandchowdary2005@gmail.com">Anand Bobba</maintainer>
   <license>Apache-2.0</license>
   <url type="repository">https://github.com/anandbobba/ros2_uwb_plugin</url>
 
