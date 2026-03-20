@@ -49,6 +49,7 @@
 #define gzdbg igndbg
 #endif
 
+#if GZ_SIM_VER < 7
 namespace gz { 
   namespace sim {
     using namespace ignition::gazebo;
@@ -57,6 +58,7 @@ namespace gz {
     using namespace ignition::math;
   }
 }
+#endif
 
 namespace ros2_uwb_research_sim
 {

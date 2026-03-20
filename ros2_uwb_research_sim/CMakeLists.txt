@@ -74,6 +74,9 @@ else()
   add_library(gz-transport13::gz-transport13 ALIAS ignition-transport11::ignition-transport11)
 endif()
 
+# Pass version to C++
+add_definitions(-DGZ_SIM_VER=${GZ_SIM_VER})
+
 include_directories(
   include
   ${EIGEN3_INCLUDE_DIRS}
