@@ -7,20 +7,17 @@ set -e
 echo "Updating system packages..."
 sudo apt update
 
-echo "Installing ROS2 Humble, Gazebo, and Python dependencies..."
-sudo apt install -y \
-  ros-humble-ros-gz \
-  ros-humble-ros-gz-bridge \
-  ros-humble-ros-gz-sim \
-  libignition-gazebo6-dev \
-  python3-matplotlib \
-  python3-pandas \
-  python3-numpy
+echo "Installing essential build tools..."
+sudo apt install -y python3-rosdep python3-colcon-common-extensions
 
-echo "Updating rosdep..."
+echo "Initializing and updating rosdep..."
+if [ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]; then
+    sudo rosdep init || true
+fi
 rosdep update
 
-echo "Installing package-specific dependencies..."
+echo "Installing all framework dependencies via rosdep..."
+# This now pulls in ros_gz_sim, ros_gz_bridge, and all msg/localization dependencies
 rosdep install --from-paths src --ignore-src -r -y
 
-echo "Installation complete! You can now build the workspace with 'colcon build'."
+echo "Installation complete! You can now build with 'colcon build'."

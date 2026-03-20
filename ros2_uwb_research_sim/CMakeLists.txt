@@ -14,13 +14,37 @@ find_package(rosidl_default_generators REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(ros2_uwb_msgs REQUIRED)
 
-# Ignition Gazebo (Fortress)
-find_package(ignition-gazebo6 REQUIRED)
-set(IGN_GAZEBO_VER 6)
-find_package(ignition-common4 REQUIRED)
-find_package(ignition-plugin1 REQUIRED)
-find_package(ignition-msgs8 REQUIRED)
-find_package(ignition-transport11 REQUIRED)
+# GZ (formerly Ignition) Gazebo - Version Agnostic Find
+find_package(gz-sim6 QUIET)
+if(NOT gz-sim6_FOUND)
+  find_package(ignition-gazebo6 REQUIRED)
+  set(GZ_SIM_VER 6)
+  add_library(gz-sim6::core ALIAS ignition-gazebo6::core)
+endif()
+
+find_package(gz-common5 QUIET)
+if(NOT gz-common5_FOUND)
+  find_package(ignition-common4 REQUIRED)
+  add_library(gz-common5::core ALIAS ignition-common4::core)
+endif()
+
+find_package(gz-plugin2 QUIET)
+if(NOT gz-plugin2_FOUND)
+  find_package(ignition-plugin1 REQUIRED)
+  add_library(gz-plugin2::core ALIAS ignition-plugin1::core)
+endif()
+
+find_package(gz-msgs10 QUIET)
+if(NOT gz-msgs10_FOUND)
+  find_package(ignition-msgs8 REQUIRED)
+  add_library(gz-msgs10::gz-msgs10 ALIAS ignition-msgs8::ignition-msgs8)
+endif()
+
+find_package(gz-transport13 QUIET)
+if(NOT gz-transport13_FOUND)
+  find_package(ignition-transport11 REQUIRED)
+  add_library(gz-transport13::gz-transport13 ALIAS ignition-transport11::ignition-transport11)
+endif()
 
 include_directories(
   include
@@ -55,11 +79,11 @@ add_library(UWBPlugin SHARED
 )
 target_link_libraries(UWBPlugin
   uwb_models
-  ignition-gazebo${IGN_GAZEBO_VER}::core
-  ignition-common4::core
-  ignition-plugin1::core
-  ignition-msgs8::ignition-msgs8
-  ignition-transport11::ignition-transport11
+  gz-sim6::core
+  gz-common5::core
+  gz-plugin2::core
+  gz-msgs10::gz-msgs10
+  gz-transport13::gz-transport13
 )
 rosidl_get_typesupport_target(cpp_typesupport_target "${PROJECT_NAME}" "rosidl_typesupport_cpp")
 target_link_libraries(UWBPlugin "${cpp_typesupport_target}")

@@ -14,17 +14,17 @@
 
 #include "ros2_uwb_research_sim/uwb_plugin.hpp"
 
-#include <ignition/plugin/Register.hh>
-#include <ignition/gazebo/components/Pose.hh>
-#include <ignition/gazebo/components/Name.hh>
-#include <ignition/gazebo/components/Model.hh>
-#include <ignition/gazebo/EntityComponentManager.hh>
-#include <ignition/gazebo/Util.hh>
+#include <gz/plugin/Register.hh>
+#include <gz/sim/components/Pose.hh>
+#include <gz/sim/components/Name.hh>
+#include <gz/sim/components/Model.hh>
+#include <gz/sim/EntityComponentManager.hh>
+#include <gz/sim/Util.hh>
 #include <rcl_interfaces/msg/set_parameters_result.hpp>
 
-IGNITION_ADD_PLUGIN(
+GZ_ADD_PLUGIN(
   ros2_uwb_research_sim::UWBPlugin,
-  ignition::gazebo::System,
+  gz::sim::System,
   ros2_uwb_research_sim::UWBPlugin::ISystemConfigure,
   ros2_uwb_research_sim::UWBPlugin::ISystemPostUpdate
 )
@@ -47,10 +47,10 @@ UWBPlugin::~UWBPlugin()
 }
 
 void UWBPlugin::Configure(
-  const ignition::gazebo::Entity & entity,
+  const gz::sim::Entity & entity,
   const std::shared_ptr<const sdf::Element> & sdf,
-  ignition::gazebo::EntityComponentManager & /*ecm*/,
-  ignition::gazebo::EventManager & /*eventMgr*/)
+  gz::sim::EntityComponentManager & /*ecm*/,
+  gz::sim::EventManager & /*eventMgr*/)
 {
   host_entity_ = entity;
 
@@ -76,7 +76,7 @@ void UWBPlugin::Configure(
   if (sdf->HasElement("noise_profile")) {
     std::string profile = sdf->Get<std::string>("noise_profile");
     params = ChannelModel::getParamsByProfile(profile);
-    ignmsg << "UWB Plugin: Using noise profile [" << profile << "]" << std::endl;
+    gzmsg << "UWB Plugin: Using noise profile [" << profile << "]" << std::endl;
   } else {
     // Individual parameter overrides (legacy)
     params.gaussian_sigma = sdf->Get<double>("gaussian_std", 0.05).first;
@@ -110,10 +110,10 @@ void UWBPlugin::Configure(
   // Optional: read target position directly from SDF
   // This avoids entity lookup issues with static models in IGN Fortress
   if (sdf->HasElement("target_position")) {
-    auto pos = sdf->Get<ignition::math::Vector3d>("target_position");
+    auto pos = sdf->Get<gz::math::Vector3d>("target_position");
     fixed_target_pos_ = Eigen::Vector3d(pos.X(), pos.Y(), pos.Z());
     has_fixed_target_pos_ = true;
-    ignmsg << "UWB Plugin: Using fixed target position (" << pos.X()
+    gzmsg << "UWB Plugin: Using fixed target position (" << pos.X()
            << ", " << pos.Y() << ", " << pos.Z() << ")" << std::endl;
   }
 
@@ -152,13 +152,13 @@ void UWBPlugin::Configure(
     }
   });
 
-  ignmsg << "UWB Plugin configured for entity [" << entity << "]. Target: [" << target_name_ <<
+  gzmsg << "UWB Plugin configured for entity [" << entity << "]. Target: [" << target_name_ <<
     "]" << std::endl;
 }
 
 void UWBPlugin::PostUpdate(
-  const ignition::gazebo::UpdateInfo & info,
-  const ignition::gazebo::EntityComponentManager & ecm)
+  const gz::sim::UpdateInfo & info,
+  const gz::sim::EntityComponentManager & ecm)
 {
   if (info.paused) {return;}
 
@@ -168,7 +168,7 @@ void UWBPlugin::PostUpdate(
   last_update_time_ = info.simTime;
 
   // Get host position
-  auto p_host_ign = ignition::gazebo::worldPose(host_entity_, ecm).Pos();
+  auto p_host_ign = gz::sim::worldPose(host_entity_, ecm).Pos();
   Eigen::Vector3d p_host(p_host_ign.X(), p_host_ign.Y(), p_host_ign.Z());
 
   // Get target position: use fixed position if available, else entity lookup
@@ -177,17 +177,17 @@ void UWBPlugin::PostUpdate(
     p_target = fixed_target_pos_;
   } else {
     // Find target entity by name if not found yet
-    if (target_entity_ == ignition::gazebo::kNullEntity) {
+    if (target_entity_ == gz::sim::kNullEntity) {
       target_entity_ = ecm.EntityByComponents(
-        ignition::gazebo::components::Name(target_name_),
-        ignition::gazebo::components::Model());
-      if (target_entity_ == ignition::gazebo::kNullEntity) {
+        gz::sim::components::Name(target_name_),
+        gz::sim::components::Model());
+      if (target_entity_ == gz::sim::kNullEntity) {
         target_entity_ = ecm.EntityByComponents(
-          ignition::gazebo::components::Name(target_name_));
+          gz::sim::components::Name(target_name_));
       }
-      if (target_entity_ == ignition::gazebo::kNullEntity) {return;}
+      if (target_entity_ == gz::sim::kNullEntity) {return;}
     }
-    auto p_target_ign = ignition::gazebo::worldPose(target_entity_, ecm).Pos();
+    auto p_target_ign = gz::sim::worldPose(target_entity_, ecm).Pos();
     p_target = Eigen::Vector3d(p_target_ign.X(), p_target_ign.Y(), p_target_ign.Z());
   }
 

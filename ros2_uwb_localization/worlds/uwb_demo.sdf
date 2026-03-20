@@ -33,9 +33,9 @@
     </scene>
 
     <!-- Plugins -->
-    <plugin filename="ignition-gazebo-physics-system" name="ignition::gazebo::systems::Physics"/>
-    <plugin filename="ignition-gazebo-user-commands-system" name="ignition::gazebo::systems::UserCommands"/>
-    <plugin filename="ignition-gazebo-scene-broadcaster-system" name="ignition::gazebo::systems::SceneBroadcaster"/>
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
+    <plugin filename="ignition-gazebo-user-commands-system" name="gz::sim::systems::UserCommands"/>
+    <plugin filename="ignition-gazebo-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
 
     <!-- Sun -->
     <light type="directional" name="sun">

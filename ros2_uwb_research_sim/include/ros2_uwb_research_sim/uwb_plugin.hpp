@@ -22,7 +22,7 @@
 #include <thread>
 #include <atomic>
 
-#include <ignition/gazebo/System.hh>
+#include <gz/sim/System.hh>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/range.hpp>
 #include "ros2_uwb_msgs/msg/uwb_range.hpp"
@@ -31,12 +31,39 @@
 
 #include "ros2_uwb_research_sim/channel_model.hpp"
 
+// GZ/Ignition Compatibility Shim
+#ifndef GZ_ADD_PLUGIN
+#define GZ_ADD_PLUGIN IGNITION_ADD_PLUGIN
+#endif
+
+#ifndef gzmsg
+#define gzmsg ignmsg
+#endif
+#ifndef gzwarn
+#define gzwarn ignwarn
+#endif
+#ifndef gzerr
+#define gzerr ignerr
+#endif
+#ifndef gzdbg
+#define gzdbg igndbg
+#endif
+
+namespace gz { 
+  namespace sim {
+    using namespace ignition::gazebo;
+  }
+  namespace math {
+    using namespace ignition::math;
+  }
+}
+
 namespace ros2_uwb_research_sim
 {
 
-class UWBPlugin : public ignition::gazebo::System,
-  public ignition::gazebo::ISystemConfigure,
-  public ignition::gazebo::ISystemPostUpdate
+class UWBPlugin : public gz::sim::System,
+  public gz::sim::ISystemConfigure,
+  public gz::sim::ISystemPostUpdate
 {
 public:
   UWBPlugin();
@@ -44,15 +71,15 @@ public:
 
   // ISystemConfigure interface
   void Configure(
-    const ignition::gazebo::Entity & entity,
+    const gz::sim::Entity & entity,
     const std::shared_ptr<const sdf::Element> & sdf,
-    ignition::gazebo::EntityComponentManager & ecm,
-    ignition::gazebo::EventManager & eventMgr) override;
+    gz::sim::EntityComponentManager & ecm,
+    gz::sim::EventManager & eventMgr) override;
 
   // ISystemPostUpdate interface
   void PostUpdate(
-    const ignition::gazebo::UpdateInfo & info,
-    const ignition::gazebo::EntityComponentManager & ecm) override;
+    const gz::sim::UpdateInfo & info,
+    const gz::sim::EntityComponentManager & ecm) override;
 
 private:
   // ROS2 components
@@ -64,8 +91,8 @@ private:
   rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr parameter_callback_handle_;
 
   // Simulation components
-  ignition::gazebo::Entity host_entity_;
-  ignition::gazebo::Entity target_entity_;
+  gz::sim::Entity host_entity_;
+  gz::sim::Entity target_entity_;
   std::string target_name_;
   std::string frame_id_;
 

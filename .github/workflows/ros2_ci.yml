@@ -1,0 +1,57 @@
+name: ROS2 UWB Framework CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ros_distro: [humble, jazzy]
+        include:
+          - ros_distro: humble
+            ubuntu_distro: jammy
+          - ros_distro: jazzy
+            ubuntu_distro: noble
+    container:
+      image: ros:${{ matrix.ros_distro }}-ros-base-${{ matrix.ubuntu_distro }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install System Dependencies
+        run: |
+          apt update && apt install -y \
+            python3-colcon-common-extensions \
+            python3-rosdep \
+            python3-vcstool \
+            wget \
+            git
+
+      - name: Initialize rosdep
+        run: |
+          if [ ! -d /etc/ros/rosdep/sources.list.d ]; then
+            rosdep init
+          fi
+          rosdep update
+
+      - name: Install Workspace Dependencies
+        run: |
+          rosdep install --from-paths . --ignore-src -r -y \
+            --skip-keys "gz-sim6-vendor gz-common5-vendor gz-plugin2-vendor gz-msgs10-vendor gz-transport13-vendor"
+
+      - name: Build Workspace
+        run: |
+          . /opt/ros/${{ matrix.ros_distro }}/setup.sh
+          colcon build --event-handlers console_direct+ --cmake-args -DCMAKE_BUILD_TYPE=Release
+
+      - name: Run Tests
+        run: |
+          . /opt/ros/${{ matrix.ros_distro }}/setup.sh
+          colcon test --event-handlers console_direct+
+          colcon test-result --verbose

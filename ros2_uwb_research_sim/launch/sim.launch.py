@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""UWB research simulation launch: Gazebo + UWB plugin + ROS-Ignition bridge."""
-
 import os
 from ament_index_python.packages import get_package_share_directory, get_package_prefix
 from launch import LaunchDescription
@@ -24,6 +22,16 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     """Build and return the UWB simulation LaunchDescription."""
+    # Detect appropriate Gazebo command based on ROS2 distribution
+    ros_distro = os.environ.get('ROS_DISTRO', 'humble')
+    if ros_distro == 'humble':
+        gz_executable = 'ign'
+        gz_subcommand = 'gazebo'
+    else:
+        # For Jazzy and beyond, use the modern 'gz sim' convention
+        gz_executable = 'gz'
+        gz_subcommand = 'sim'
+
     pkg_uwb_sim = get_package_share_directory('ros2_uwb_research_sim')
     pkg_prefix = get_package_prefix('ros2_uwb_research_sim')
 
@@ -48,10 +56,15 @@ def generate_launch_description():
             description='Use simulation (Gazebo) clock if true'
         ),
 
-        # Set Ignition Gazebo plugin path so it can find libUWBPlugin.so
+        # Set GZ/IGN Gazebo plugin path so it can find libUWBPlugin.so
+        # We set both for maximum cross-version compatibility
+        SetEnvironmentVariable(
+            name='GZ_SIM_SYSTEM_PLUGIN_PATH',
+            value=[plugin_path]
+        ),
         SetEnvironmentVariable(
             name='IGN_GAZEBO_SYSTEM_PLUGIN_PATH',
-            value=[os.environ.get('IGN_GAZEBO_SYSTEM_PLUGIN_PATH', ''), ':', plugin_path]
+            value=[plugin_path]
         ),
 
         # Set LD_LIBRARY_PATH so the system can find libuwb_models.so
@@ -60,9 +73,9 @@ def generate_launch_description():
             value=[os.environ.get('LD_LIBRARY_PATH', ''), ':', plugin_path]
         ),
 
-        # Launch Ignition Gazebo
+        # Launch Gazebo Sim (Runtime CLI detection)
         ExecuteProcess(
-            cmd=['ign', 'gazebo', '-r', LaunchConfiguration('world')],
+            cmd=[gz_executable, gz_subcommand, '-r', LaunchConfiguration('world')],
             output='screen'
         ),
 
@@ -87,20 +100,29 @@ def generate_launch_description():
             output='screen',
         ),
 
-        # ROS - Ignition Bridge
+        # Dedicated /clock Bridge (Prevents clock lag by isolating it)
         Node(
             package='ros_gz_bridge',
             executable='parameter_bridge',
+            name='clock_bridge',
+            arguments=['/world/uwb_world/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock'],
+            remappings=[('/world/uwb_world/clock', '/clock')],
+            output='screen'
+        ),
+
+        # General ROS - GZ Bridge
+        Node(
+            package='ros_gz_bridge',
+            executable='parameter_bridge',
+            name='general_bridge',
             arguments=[
-                '/cmd_vel@geometry_msgs/msg/Twist@ignition.msgs.Twist',
-                '/odom@nav_msgs/msg/Odometry[ignition.msgs.Odometry',
-                '/ground_truth/odom@nav_msgs/msg/Odometry[ignition.msgs.Odometry',
-                '/model/tag_robot/tf@tf2_msgs/msg/TFMessage[ignition.msgs.Pose_V',
-                '/model/tag_robot/joint_state@sensor_msgs/msg/JointState[ignition.msgs.Model',
-                '/world/uwb_world/clock@rosgraph_msgs/msg/Clock[ignition.msgs.Clock',
+                '/cmd_vel@geometry_msgs/msg/Twist@gz.msgs.Twist',
+                '/odom@nav_msgs/msg/Odometry[gz.msgs.Odometry',
+                '/ground_truth/odom@nav_msgs/msg/Odometry[gz.msgs.Odometry',
+                '/model/tag_robot/tf@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V',
+                '/model/tag_robot/joint_state@sensor_msgs/msg/JointState[gz.msgs.Model',
             ],
             remappings=[
-                ('/world/uwb_world/clock', '/clock'),
                 ('/model/tag_robot/tf', '/tf'),
                 ('/model/tag_robot/joint_state', '/joint_states'),
                 ('/ground_truth/odom', '/ground_truth/pose'),
