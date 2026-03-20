@@ -88,6 +88,7 @@ target_link_libraries(UWBPlugin
 rosidl_get_typesupport_target(cpp_typesupport_target "${PROJECT_NAME}" "rosidl_typesupport_cpp")
 target_link_libraries(UWBPlugin "${cpp_typesupport_target}")
 add_dependencies(UWBPlugin ${PROJECT_NAME}__rosidl_typesupport_cpp)
+
 ament_target_dependencies(UWBPlugin
   rclcpp
   sensor_msgs

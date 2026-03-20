@@ -1,5 +1,33 @@
 # ROS2 UWB Localization Framework
 
+[![ROS2 Humble](https://img.shields.io/badge/ROS2-Humble-blue)](https://docs.ros.org/en/humble/)
+[![Gazebo Fortress](https://img.shields.io/badge/Gazebo-Fortress-orange)](https://gazebosim.org/home)
+[![Build Status](https://github.com/anandbobba/ros2_uwb_plugin/actions/workflows/ros2_ci.yml/badge.svg)](https://github.com/anandbobba/ros2_uwb_plugin/actions)
+
+A modular, research-grade UWB localization pipeline for ROS2 and Gazebo.
+
+---
+
+## 🛠 Stability & Troubleshooting
+
+### 1. Topic Sync & Robot Model Errors
+If you see "No transform from [base_link] to [map]" in RViz or if topics like `/tf` appear empty, it is likely due to **Fast-DDS Shared Memory (SHM)** lock contention. 
+
+**Solution**: Switch to `cyclonedds` for superior stability in simulation environments:
+```bash
+sudo apt update && sudo apt install ros-humble-rmw-cyclonedds-cpp
+export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+ros2 launch ros2_uwb_research_sim demo.launch.py
+```
+
+### 2. Gazebo Force-Quit / Symbol Errors
+If Gazebo crashes on startup:
+1.  **Clear stale transport locks**: `rm -rf /dev/shm/fastrtps*`
+2.  **Clean Build**: `rm -rf build/ install/ && colcon build --symlink-install`
+
+---
+
+
 [![ROS2 Humble](https://img.shields.io/badge/ROS2-Humble-blue.svg)](https://docs.ros.org/en/humble/)
 [![C++](https://img.shields.io/badge/C++-17-orange.svg)](https://en.cppreference.com/w/cpp/17)
 [![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](LICENSE)
