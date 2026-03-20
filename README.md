@@ -3,62 +3,25 @@
 [![ROS2 Humble](https://img.shields.io/badge/ROS2-Humble-blue)](https://docs.ros.org/en/humble/)
 [![Gazebo Fortress](https://img.shields.io/badge/Gazebo-Fortress-orange)](https://gazebosim.org/home)
 [![Build Status](https://github.com/anandbobba/ros2_uwb_plugin/actions/workflows/ros2_ci.yml/badge.svg)](https://github.com/anandbobba/ros2_uwb_plugin/actions)
-
-A modular, research-grade UWB localization pipeline for ROS2 and Gazebo.
-
----
-
-## 🛠 Stability & Troubleshooting
-
-### 1. Topic Sync & Robot Model Errors
-If you see "No transform from [base_link] to [map]" in RViz or if topics like `/tf` appear empty, it is likely due to **Fast-DDS Shared Memory (SHM)** lock contention. 
-
-**Solution**: Switch to `cyclonedds` for superior stability in simulation environments:
-```bash
-sudo apt update && sudo apt install ros-humble-rmw-cyclonedds-cpp
-export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-ros2 launch ros2_uwb_research_sim demo.launch.py
-```
-
-### 2. Gazebo Force-Quit / Symbol Errors
-If Gazebo crashes on startup:
-1.  **Clear stale transport locks**: `rm -rf /dev/shm/fastrtps*`
-2.  **Clean Build**: `rm -rf build/ install/ && colcon build --symlink-install`
-
----
-
-
-[![ROS2 Humble](https://img.shields.io/badge/ROS2-Humble-blue.svg)](https://docs.ros.org/en/humble/)
-[![C++](https://img.shields.io/badge/C++-17-orange.svg)](https://en.cppreference.com/w/cpp/17)
 [![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](LICENSE)
-[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen.svg)]()
 
-A modular, production-grade UWB (Ultra-Wideband) localization ecosystem for ROS2. This framework provides high-fidelity simulation, robust position estimation, and research-grade diagnostic tools for analyzing signal propagation errors (NLOS, Multipath, Drift).
-
----
-
-## 🛠 Features
-
-- **Realistic Simulation**: Gazebo (Ignition) plugin with modular noise models:
-  - **Gaussian Noise**: Thermal and quantization error.
-  - **NLOS Bias**: Exponentially distributed bias for obstructed paths.
-  - **Multipath AR(1)**: Time-correlated noise from signal reflections.
-  - **Clock Drift**: Random walk oscillator instability.
-- **Robust Localization**: 
-  - Iterative Weighted Gauss-Newton Trilateration (3D and 2D modes).
-  - Multi-sensor fusion via `robot_localization` EKF.
-- **Research Analytics**:
-  - Real-time error attribution (What % of error is NLOS vs. Noise?).
-  - Automated CSV dataset logging and ROS bag integration.
-  - Python scripts for RMSE, MAE, and P95 precision analysis.
-- **Ease of Use**: Unified launch system with automatic robot autopilot.
-- **Dependency Installer**: One-script setup for all system and ROS2 dependencies.
+A modular, research-grade UWB localization framework for ROS2 and Gazebo.
 
 ---
 
 ## 🎥 Demo
 
-[▶️ Watch the ROS2 UWB Framework in Action](https://drive.google.com/drive/folders/156ZFzQYNlvvF9lHqF-TpCHE53OlKgoRr?usp=drive_link)
+[▶️ Watch Demo](https://drive.google.com/file/d/1kJ0pV0zVk8k41X8jCc-OAbcPqFgLc1oQ/view?usp=drive_link)
+
+---
+
+## 🛠 Features
+
+- **High-Fidelity Simulation**: Gazebo plugin with modular error models (Gaussian, NLOS Bias, Multipath, Clock Drift).
+- **Position Estimation**: Iterative Weighted Gauss-Newton Trilateration supporting 2D and 3D modes.
+- **Sensor Fusion**: Multi-sensor fusion via `robot_localization` EKF (UWB + Odometry).
+- **Advanced Diagnostics**: Real-time error attribution and signal propagation analysis.
+- **Hardware Agnostic**: Generic serial interface for real UWB sensors with built-in Mock Mode.
 
 ---
 
@@ -88,106 +51,112 @@ A modular, production-grade UWB (Ultra-Wideband) localization ecosystem for ROS2
 
 ## 🚀 Quick Start
 
-### 1. Set Up the Environment
+### 1. Installation
 ```bash
+# Create workspace
 mkdir -p ~/ros2_uwb_ws/src && cd ~/ros2_uwb_ws/src
 git clone https://github.com/anandbobba/ros2_uwb_plugin.git .
 cd ..
 
-# Install all binary and system dependencies automatically
-chmod +x src/install_dependencies.sh
-./src/install_dependencies.sh
+# Install dependencies using rosdep
+rosdep update
+rosdep install --from-paths src --ignore-src -r -y
+
+# Optional: Automated system setup
+# chmod +x src/install_dependencies.sh && ./src/install_dependencies.sh
 
 # Build
 colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
 source install/setup.bash
 ```
 
-### 2. Run the Full Demo
-Launch the simulator, localization pipeline, and automatic robot motion:
+### 2. Launch Simulation
+Launch the simulator, localization pipeline, and automated research autopilot:
 ```bash
+# Recommended for stability (CycloneDDS)
+export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 ros2 launch ros2_uwb_research_sim demo.launch.py
 ```
-*(Inside Gazebo, click the "Play" button. The robot will start circular motion immediately.)*
+*Note: In Gazebo, click the "Play" button to start the simulation.*
 
-### 3. Performance Mode (Recommended)
-If your system experiences lag or "Jump in time" warnings, run in **Headless Mode** (Server only + RViz). This is 10x more stable for long-term research data collection:
-```bash
-ros2 launch ros2_uwb_research_sim demo.launch.py gazebo_gui:=false
-```
 ---
 
 ## 📊 Research Workflow
 
-### Recording Datasets
-Capture raw UWB ranges, fused poses, and error diagnostics for offline analysis:
+### Dataset Recording
+Capture ranges, filtered poses, and diagnostic metrics for offline evaluation:
 ```bash
 ros2 launch ros2_uwb_localization record_dataset.launch.py
 ```
 
-### Accuracy Analysis
-Once recorded, generate performance plots and error attribution reports:
+### Performance Analytics
+Generate error distribution plots and attribution reports from recorded CSV data:
 ```bash
-# General performance (RMSE/Trajectory)
+# Trajectory and RMSE analysis
 python3 ros2_uwb_localization/scripts/plot_results.py <dataset>.csv
 
-# Research diagnostics (NLOS/Correlation)
+# Signal error attribution (NLOS vs. Noise)
 python3 ros2_uwb_localization/scripts/plot_diagnostics.py <dataset>.csv
 ```
 
-### Dynamic Noise Profiles
-Modify the environment complexity at runtime:
+### Runtime Configuration
+Dynamically modify environment complexity via ROS2 parameters:
 ```bash
 ros2 param set /uwb_plugin_uwb_anchor_0 nlos_prob 0.8
 ```
 
 ---
 
-## 📁 Repository Structure
+## 🔌 Real Hardware Usage
 
-- `ros2_uwb_msgs`: Custom interfaces for range aggregation and diagnostics.
-- `ros2_uwb_localization`: Core positioning engine, preprocessor, and benchmark nodes.
-- `ros2_uwb_research_sim`: Ignition Gazebo world, robot URDF, and research plugin.
-- `ros2_uwb_drivers`: Generic serial bridge for real UWB hardware (with Mock Mode).
+The framework includes a generic serial driver to bridge physical UWB tags (Decawave, LinkTrack, etc.) into the pipeline.
+
+1.  **Configure**: Update port settings in `ros2_uwb_drivers/config/uwb_driver.yaml`.
+2.  **Launch Driver**:
+    ```bash
+    ros2 launch ros2_uwb_drivers uwb_driver.launch.py
+    ```
+3.  **Run Pipeline**:
+    ```bash
+    ros2 launch ros2_uwb_localization localization.launch.py
+    ```
 
 ---
 
-## 📡 Example Output (Topics)
+## 📁 Repository Structure
+
+- `ros2_uwb_msgs`: Custom interfaces for range aggregation and error diagnostics.
+- `ros2_uwb_localization`: Core positioning engine, preprocessor, and benchmark nodes.
+- `ros2_uwb_research_sim`: Gazebo simulator, robot models, and research plugin.
+- `ros2_uwb_drivers`: Generic serial bridge for hardware integration.
+
+---
+
+## 📡 Topics Output
 
 | Topic | Description |
 |---|---|
-| `/uwb/range` | Raw range measurements from simulator/hardware. |
-| `/uwb/pose` | Absolute pose from the Trilateration Solver. |
-| `/odometry/filtered_uwb` | Fused EKF output (UWB + Wheel Odometry). |
-| `/uwb/error_diagnostics` | Breakdown of specific error sources (physical truth). |
+| `/uwb/range` | Incoming range measurements (Sim or Hardware). |
+| `/uwb/pose` | Pure UWB absolute position estimate. |
+| `/odometry/filtered_uwb` | Fused EKF output (UWB + Odometry). |
+| `/uwb/error_diagnostics` | Real-time breakdown of noise sources (Truth vs Measured). |
 
 ---
 
-## 🔌 Using Real UWB Hardware
+## 🛠 Troubleshooting
 
-The framework includes a generic serial driver to bridge real UWB sensors (e.g., Decawave, LinkTrack) into the ROS2 pipeline.
-
-### 1. Connection
-Connect your UWB master tag to your computer via USB/UART. 
-Ensure the hardware output format is CSV-style: `ANCHOR_ID,RANGE_METERS,RSSI`.
-
-### 2. Configure & Run
-Update `ros2_uwb_drivers/config/uwb_driver.yaml` with your device path:
-
+### Topic Connectivity & Missing Transforms
+If you see "No transform" errors in RViz or empty topics, clear the Shared Memory locks and switch to CycloneDDS:
 ```bash
-# Run the hardware driver (Default: Mock Mode enabled)
-ros2 launch ros2_uwb_drivers uwb_driver.launch.py
+rm -rf /dev/shm/fastrtps*
+export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 ```
 
-> [!TIP]
-> **Mock Mode**: If you don't have hardware yet, keep `use_mock: true` in the config. The driver will generate realistic dummy data for testing your pipeline.
-> **Real Hardware**: Set `use_mock: false` and `serial_port: "/dev/ttyUSB0"` once your sensor is plugged in.
-
-### 3. Pipeline Integration
-Since the driver publishes to `/uwb/range`, you can run the standard localization stack alongside it:
+### Gazebo Stability
+If simulation crashes on startup, ensure you have ran a clean build:
 ```bash
-# Run trilateration and EKF using real hardware data
-ros2 launch ros2_uwb_localization localization.launch.py
+rm -rf build/ install/ log/
+colcon build --symlink-install
 ```
 
 ---
