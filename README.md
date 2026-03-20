@@ -120,6 +120,7 @@ ros2 param set /uwb_plugin_uwb_anchor_0 nlos_prob 0.8
 - `ros2_uwb_msgs`: Custom interfaces for range aggregation and diagnostics.
 - `ros2_uwb_localization`: Core positioning engine, preprocessor, and benchmark nodes.
 - `ros2_uwb_research_sim`: Ignition Gazebo world, robot URDF, and research plugin.
+- `ros2_uwb_drivers`: Generic serial bridge for real UWB hardware (with Mock Mode).
 
 ---
 
@@ -134,13 +135,33 @@ ros2 param set /uwb_plugin_uwb_anchor_0 nlos_prob 0.8
 
 ---
 
-## 🤝 Contributing & Support
+## 🔌 Using Real UWB Hardware
 
-We welcome contributions to UWB error modeling and filtering algorithms.
-1. Fork the repo.
-2. Create your feature branch (`git checkout -b feature/nlos-rejection`).
-3. Commit changes (`git commit -m 'Add NLOS rejection'`).
-4. Push to the branch (`git push origin feature/nlos-rejection`).
-5. Open a Pull Request.
+The framework includes a generic serial driver to bridge real UWB sensors (e.g., Decawave, LinkTrack) into the ROS2 pipeline.
+
+### 1. Connection
+Connect your UWB master tag to your computer via USB/UART. 
+Ensure the hardware output format is CSV-style: `ANCHOR_ID,RANGE_METERS,RSSI`.
+
+### 2. Configure & Run
+Update `ros2_uwb_drivers/config/uwb_driver.yaml` with your device path:
+
+```bash
+# Run the hardware driver (Default: Mock Mode enabled)
+ros2 launch ros2_uwb_drivers uwb_driver.launch.py
+```
+
+> [!TIP]
+> **Mock Mode**: If you don't have hardware yet, keep `use_mock: true` in the config. The driver will generate realistic dummy data for testing your pipeline.
+> **Real Hardware**: Set `use_mock: false` and `serial_port: "/dev/ttyUSB0"` once your sensor is plugged in.
+
+### 3. Pipeline Integration
+Since the driver publishes to `/uwb/range`, you can run the standard localization stack alongside it:
+```bash
+# Run trilateration and EKF using real hardware data
+ros2 launch ros2_uwb_localization localization.launch.py
+```
+
+---
 
 **License**: Apache 2.0

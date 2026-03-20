@@ -1,0 +1,17 @@
+/**:
+  ros__parameters:
+    # Serial Port Settings
+    # Use 'ls /dev/tty*' to find your real port (e.g., /dev/ttyUSB0 or /dev/ttyACM0)
+    serial_port: "/dev/ttyUSB0"
+    baudrate: 115200
+
+    # Mock Mode: Set to true to generate dummy data if hardware is NOT plugged in
+    use_mock: true
+
+    # ROS2 Settings
+    frame_id: "uwb_tag"
+    topic: "/uwb/range"
+
+    # Calibration / Error Model
+    # Expected standard deviation for the trilateration solver
+    std_dev: 0.05
