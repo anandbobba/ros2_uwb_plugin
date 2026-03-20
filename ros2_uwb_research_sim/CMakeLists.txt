@@ -15,33 +15,61 @@ find_package(Eigen3 REQUIRED)
 find_package(ros2_uwb_msgs REQUIRED)
 
 # GZ (formerly Ignition) Gazebo - Version Agnostic Find
-find_package(gz-sim6 QUIET)
-if(NOT gz-sim6_FOUND)
+set(GZ_SIM_VER 0)
+
+# Try GZ Sim versions (8=Harmonic/Jazzy, 7=Garden, 6=Fortress/Humble)
+foreach(ver 8 7 6)
+  if(GZ_SIM_VER EQUAL 0)
+    find_package(gz-sim${ver} QUIET)
+    if(gz-sim${ver}_FOUND)
+      set(GZ_SIM_VER ${ver})
+      message(STATUS "Found GZ Sim version ${ver}")
+    endif()
+  endif()
+endforeach()
+
+if(GZ_SIM_VER GREATER 0)
+  # Map GZ components dynamically based on found version
+  add_library(gz-sim6::core ALIAS gz-sim${GZ_SIM_VER}::core)
+  
+  find_package(gz-common5 QUIET)
+  if(NOT gz-common5_FOUND)
+    find_package(gz-common4 REQUIRED)
+    add_library(gz-common5::core ALIAS gz-common4::core)
+  endif()
+
+  find_package(gz-plugin2 QUIET)
+  if(NOT gz-plugin2_FOUND)
+    find_package(gz-plugin1 REQUIRED)
+    add_library(gz-plugin2::core ALIAS gz-plugin1::core)
+  endif()
+
+  find_package(gz-msgs10 QUIET)
+  if(NOT gz-msgs10_FOUND)
+    find_package(gz-msgs8 REQUIRED)
+    add_library(gz-msgs10::gz-msgs10 ALIAS gz-msgs8::gz-msgs8)
+  endif()
+
+  find_package(gz-transport13 QUIET)
+  if(NOT gz-transport13_FOUND)
+    find_package(gz-transport11 REQUIRED)
+    add_library(gz-transport13::gz-transport13 ALIAS gz-transport11::gz-transport11)
+  endif()
+else()
+  # Legacy Ignition Fallback
   find_package(ignition-gazebo6 REQUIRED)
   set(GZ_SIM_VER 6)
   add_library(gz-sim6::core ALIAS ignition-gazebo6::core)
-endif()
-
-find_package(gz-common5 QUIET)
-if(NOT gz-common5_FOUND)
+  
   find_package(ignition-common4 REQUIRED)
   add_library(gz-common5::core ALIAS ignition-common4::core)
-endif()
 
-find_package(gz-plugin2 QUIET)
-if(NOT gz-plugin2_FOUND)
   find_package(ignition-plugin1 REQUIRED)
   add_library(gz-plugin2::core ALIAS ignition-plugin1::core)
-endif()
 
-find_package(gz-msgs10 QUIET)
-if(NOT gz-msgs10_FOUND)
   find_package(ignition-msgs8 REQUIRED)
   add_library(gz-msgs10::gz-msgs10 ALIAS ignition-msgs8::ignition-msgs8)
-endif()
 
-find_package(gz-transport13 QUIET)
-if(NOT gz-transport13_FOUND)
   find_package(ignition-transport11 REQUIRED)
   add_library(gz-transport13::gz-transport13 ALIAS ignition-transport11::ignition-transport11)
 endif()
