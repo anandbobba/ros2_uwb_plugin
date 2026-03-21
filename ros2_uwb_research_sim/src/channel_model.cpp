@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <memory>
+
 #include "ros2_uwb_research_sim/channel_model.hpp"
 
 namespace ros2_uwb_research_sim

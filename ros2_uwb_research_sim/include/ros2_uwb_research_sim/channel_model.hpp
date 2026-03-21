@@ -15,6 +15,7 @@
 #ifndef ROS2_UWB_RESEARCH_SIM__CHANNEL_MODEL_HPP_
 #define ROS2_UWB_RESEARCH_SIM__CHANNEL_MODEL_HPP_
 
+#include <memory>
 #include <string>
 
 #include "physics_model.hpp"
