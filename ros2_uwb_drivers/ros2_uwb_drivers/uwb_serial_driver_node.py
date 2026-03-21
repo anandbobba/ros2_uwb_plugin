@@ -21,9 +21,9 @@ import threading
 
 class UWBSerialDriver(Node):
     """
-    Generic UWB Serial Driver Node.
-    Parses serial data in the format: ANCHOR_ID,RANGE_METERS,RSSI
-    Example: A0,7.23,-58
+    ROS2 Node for interfacing with UWB hardware over serial.
+
+    Reads range data from a serial port and publishes UWBRange messages.
     """
 
     def __init__(self):
@@ -73,7 +73,7 @@ class UWBSerialDriver(Node):
         self.thread.start()
 
     def read_loop(self):
-        """Main loop for reading serial data or generating mock pulses."""
+        """Run the main read loop from the serial port."""
         import time
         import random
         while rclpy.ok() and not self.stop_flag:
@@ -94,8 +94,9 @@ class UWBSerialDriver(Node):
 
     def parse_line(self, line):
         """
-        Parses format: ANCHOR_ID,RANGE,RSSI
-        Example: uwb_anchor_0,5.12,-60
+        Parse a single line of serial data.
+
+        Identifies expected formats like ANCHOR_ID,RANGE,RSSI.
         """
         parts = line.split(',')
         if len(parts) >= 2:
@@ -115,7 +116,7 @@ class UWBSerialDriver(Node):
                 msg.range = range_val
                 msg.rssi = rssi
                 msg.std_dev = self.std_dev
-                
+
                 self.publisher.publish(msg)
 
             except ValueError:

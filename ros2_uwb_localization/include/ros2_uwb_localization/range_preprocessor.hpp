@@ -27,7 +27,6 @@ namespace ros2_uwb_localization
 
 /**
  * @brief Node that aggregates single UWB range measurements into synchronized MultiRange messages.
- * 
  * It listens to /uwb/range (standardized UWBRange) and publishes aggregated /uwb/ranges_filtered.
  * This acts as a sensor abstraction layer, allowing the solver to work with a single topic.
  */
@@ -46,14 +45,15 @@ private:
   rclcpp::TimerBase::SharedPtr timer_;
   rclcpp::Node::OnSetParametersCallbackHandle::SharedPtr on_set_parameters_callback_handle_;
 
-  struct CachedRange {
+  struct CachedRange
+  {
     ros2_uwb_msgs::msg::UWBRange last_msg;
     rclcpp::Time last_update;
     bool valid;
   };
 
   std::map<std::string, CachedRange> range_cache_;
-  
+
   // Parameters
   double range_timeout_;
   double min_range_;

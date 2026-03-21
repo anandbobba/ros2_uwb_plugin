@@ -15,7 +15,8 @@
 #ifndef ROS2_UWB_RESEARCH_SIM__CHANNEL_MODEL_HPP_
 #define ROS2_UWB_RESEARCH_SIM__CHANNEL_MODEL_HPP_
 
-#include <memory>
+#include <string>
+
 #include "physics_model.hpp"
 #include "gaussian_noise_model.hpp"
 #include "nlos_bias_model.hpp"
@@ -60,7 +61,7 @@ public:
   UWBMeasurement computeDetailedMeasurement(
     const Eigen::Vector3d & anchor_pos,
     const Eigen::Vector3d & tag_pos);
-  
+
   void setParams(const ChannelParams & params);
   const ChannelParams & getParams() const {return params_;}
 

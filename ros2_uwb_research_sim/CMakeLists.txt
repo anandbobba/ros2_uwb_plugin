@@ -31,7 +31,6 @@ endforeach()
 if(GZ_SIM_VER GREATER 0)
   # Map GZ components dynamically based on found version
   add_library(gz-sim6::core ALIAS gz-sim${GZ_SIM_VER}::core)
-  
   find_package(gz-common5 QUIET)
   if(NOT gz-common5_FOUND)
     find_package(gz-common4 REQUIRED)
@@ -60,7 +59,6 @@ else()
   find_package(ignition-gazebo6 REQUIRED)
   set(GZ_SIM_VER 6)
   add_library(gz-sim6::core ALIAS ignition-gazebo6::core)
-  
   find_package(ignition-common4 REQUIRED)
   add_library(gz-common5::core ALIAS ignition-common4::core)
 

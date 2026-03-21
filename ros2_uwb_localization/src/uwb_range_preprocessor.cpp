@@ -17,7 +17,7 @@
 namespace ros2_uwb_localization
 {
 RangePreprocessor::RangePreprocessor()
-  : Node("uwb_range_preprocessor")
+: Node("uwb_range_preprocessor")
 {
   this->declare_parameter("publish_rate", 20.0);
   this->declare_parameter("range_timeout", 0.5);
@@ -100,7 +100,8 @@ void RangePreprocessor::range_callback(const ros2_uwb_msgs::msg::UWBRange::Share
 
   // EVENT-DRIVEN PUBLISH: Immediately aggregate and publish
   auto out_msg = ros2_uwb_msgs::msg::UWBMultiRange();
-  out_msg.header.stamp = msg->header.stamp;  // Inherit exactly the timestamp of the triggering range
+  // Inherit exactly the timestamp of the triggering range
+  out_msg.header.stamp = msg->header.stamp;
   out_msg.header.frame_id = base_frame_;
 
   rclcpp::Time current_time(msg->header.stamp);

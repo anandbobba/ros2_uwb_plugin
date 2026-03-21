@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "ros2_uwb_localization/trilateration_solver.hpp"
-
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+
+#include "ros2_uwb_localization/trilateration_solver.hpp"
 
 namespace ros2_uwb_localization
 {
 
 TrilaterationSolver::TrilaterationSolver()
-  : Node("uwb_trilateration_solver")
+: Node("uwb_trilateration_solver")
 {
   this->declare_parameter("output_frame", "map");
   this->declare_parameter("min_anchors", 3);
@@ -119,7 +119,8 @@ void TrilaterationSolver::load_anchors_from_params()
     "Loaded %zu UWB anchors from parameters", anchors_.size());
 }
 
-void TrilaterationSolver::multi_range_callback(const ros2_uwb_msgs::msg::UWBMultiRange::SharedPtr msg)
+void TrilaterationSolver::multi_range_callback(
+  const ros2_uwb_msgs::msg::UWBMultiRange::SharedPtr msg)
 {
   std::vector<Anchor> active;
   for (const auto & r : msg->ranges) {
@@ -140,7 +141,9 @@ void TrilaterationSolver::multi_range_callback(const ros2_uwb_msgs::msg::UWBMult
     return;
   }
 
-  RCLCPP_INFO_ONCE(this->get_logger(), "Solver receiving ranges for %zu anchors. Localization active.", active.size());
+  RCLCPP_INFO_ONCE(
+    this->get_logger(), "Solver receiving ranges for %zu anchors. Localization active.",
+    active.size());
   solve_trilateration(msg, active);
 }
 
@@ -159,7 +162,11 @@ void TrilaterationSolver::solve_trilateration(
 
     for (int iter = 0; iter < optimization_iterations_; ++iter) {
       int valid_count = 0;
-      for (size_t j = 0; j < n; ++j) { if (!is_outlier[j]) {valid_count++;} }
+      for (size_t j = 0; j < n; ++j) {
+        if (!is_outlier[j]) {
+          valid_count++;
+        }
+      }
       if (valid_count < min_anchors_) {return;}
 
       Eigen::MatrixXd J(valid_count, 2);
@@ -191,17 +198,25 @@ void TrilaterationSolver::solve_trilateration(
             xy.y() - active[j].position.y(),
             z_fixed - active[j].position.z());
           double residual = std::abs(msg->ranges[j].range - diff.norm());
-          if (residual > outlier_threshold_) { is_outlier[j] = true; }
+          if (residual > outlier_threshold_) {
+            is_outlier[j] = true;
+          }
         }
       }
 
-      if (dxy.norm() < convergence_threshold_) { H2 = JtJ; break; }
-      if (iter == optimization_iterations_ - 1) { H2 = JtJ; }
+      if (dxy.norm() < convergence_threshold_) {
+        H2 = JtJ;
+        break;
+      }
+      if (iter == optimization_iterations_ - 1) {
+        H2 = JtJ;
+      }
     }
 
     current_estimate_ = Eigen::Vector3d(xy.x(), xy.y(), z_fixed);
     if (std::abs(H2.determinant()) < 1e-10) {
-      RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000,
+      RCLCPP_WARN_THROTTLE(
+        this->get_logger(), *this->get_clock(), 5000,
         "2D solver: near-singular geometry");
       return;
     }
@@ -223,7 +238,11 @@ void TrilaterationSolver::solve_trilateration(
 
     for (int iter = 0; iter < optimization_iterations_; ++iter) {
       int valid_count = 0;
-      for (size_t j = 0; j < n; ++j) { if (!is_outlier[j]) {valid_count++;} }
+      for (size_t j = 0; j < n; ++j) {
+        if (!is_outlier[j]) {
+          valid_count++;
+        }
+      }
       if (valid_count < min_anchors_) {return;}
 
       Eigen::MatrixXd J(valid_count, 3);
@@ -247,12 +266,19 @@ void TrilaterationSolver::solve_trilateration(
         for (size_t j = 0; j < n; ++j) {
           if (is_outlier[j]) {continue;}
           double residual = std::abs(msg->ranges[j].range - (x - active[j].position).norm());
-          if (residual > outlier_threshold_) { is_outlier[j] = true; }
+          if (residual > outlier_threshold_) {
+            is_outlier[j] = true;
+          }
         }
       }
 
-      if (dx.norm() < convergence_threshold_) { H = JtJ; break; }
-      if (iter == optimization_iterations_ - 1) { H = JtJ; }
+      if (dx.norm() < convergence_threshold_) {
+        H = JtJ;
+        break;
+      }
+      if (iter == optimization_iterations_ - 1) {
+        H = JtJ;
+      }
     }
 
     current_estimate_ = x;

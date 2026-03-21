@@ -36,7 +36,7 @@ def generate_launch_description():
         'launch_rviz',
         default_value='true',
         description='Run RViz visualization if true')
-    
+
     use_sim_time = LaunchConfiguration('use_sim_time')
     run_rviz = LaunchConfiguration('launch_rviz')
 

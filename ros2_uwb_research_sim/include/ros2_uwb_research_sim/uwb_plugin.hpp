@@ -50,13 +50,16 @@
 #endif
 
 #if GZ_SIM_VER < 7
-namespace gz { 
-  namespace sim {
-    using namespace ignition::gazebo;
-  }
-  namespace math {
-    using namespace ignition::math;
-  }
+namespace gz
+{
+namespace sim
+{
+using namespace ignition::gazebo;  // NOLINT
+}
+namespace math
+{
+using namespace ignition::math;    // NOLINT
+}
 }
 #endif
 

@@ -60,18 +60,24 @@ public:
     log_file_.open(log_file_path_);
     log_file_ << "timestamp,error_x,error_y,error_z,error_3d,gaussian,nlos,multipath,drift\n";
 
-    RCLCPP_INFO(this->get_logger(), "Benchmarking node started. Logging to %s", log_file_path_.c_str());
+    RCLCPP_INFO(
+      this->get_logger(), "Benchmarking node started. Logging to %s",
+      log_file_path_.c_str());
   }
 
   void generate_final_report()
   {
-    if (errors_.empty()) return;
+    if (errors_.empty()) {
+      return;
+    }
 
-    double rmse = std::sqrt(std::accumulate(errors_.begin(), errors_.end(), 0.0, 
-      [](double a, double b) { return a + b * b; }) / errors_.size());
-    double mae = std::accumulate(errors_.begin(), errors_.end(), 0.0, 
-      [](double a, double b) { return a + std::abs(b); }) / errors_.size();
-    
+    double rmse = std::sqrt(
+      std::accumulate(
+        errors_.begin(), errors_.end(), 0.0,
+        [](double a, double b) {return a + b * b;}) / errors_.size());
+    double mae = std::accumulate(
+      errors_.begin(), errors_.end(), 0.0,
+      [](double a, double b) {return a + std::abs(b);}) / errors_.size();
     std::vector<double> sorted_errors = errors_;
     std::sort(sorted_errors.begin(), sorted_errors.end());
     double p95 = sorted_errors[static_cast<size_t>(sorted_errors.size() * 0.95)];
@@ -89,16 +95,16 @@ public:
       std::cout << "  NLOS Bias : " << (total_nlos_ / total_abs_err) * 100.0 << "%\n";
       std::cout << "  Multipath : " << (total_multipath_ / total_abs_err) * 100.0 << "%\n";
       std::cout << "  ClockDrift: " << (total_drift_ / total_abs_err) * 100.0 << "%\n";
-      std::cout << "  NLOS Rate : " << (static_cast<double>(nlos_events_) / diag_count_) * 100.0 << "%\n";
-      
+      std::cout << "  NLOS Rate : " << (static_cast<double>(nlos_events_) / diag_count_) * 100.0 <<
+        "%\n";
       if (multipath_series_.size() > 1) {
           double mean = total_multipath_ / multipath_series_.size();
           double num = 0, den = 0;
-          for(size_t i=0; i < multipath_series_.size()-1; ++i) {
-            num += (multipath_series_[i] - mean) * (multipath_series_[i+1] - mean);
+          for (size_t i = 0; i < multipath_series_.size() - 1; ++i) {
+            num += (multipath_series_[i] - mean) * (multipath_series_[i + 1] - mean);
             den += (multipath_series_[i] - mean) * (multipath_series_[i] - mean);
           }
-          std::cout << "  Multipath Correlation (lag-1): " << (den > 0 ? num/den : 0) << "\n";
+          std::cout << "  Multipath Correlation (lag-1): " << (den > 0 ? num / den : 0) << "\n";
       }
     }
     std::cout << "-----------------------------\n";
@@ -114,19 +120,21 @@ private:
 
   void est_callback(const geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg)
   {
-    if (!last_gt_) return;
+    if (!last_gt_) {
+      return;
+    }
 
     double dx = msg->pose.pose.position.x - last_gt_->pose.pose.position.x;
     double dy = msg->pose.pose.position.y - last_gt_->pose.pose.position.y;
     double dz = msg->pose.pose.position.z - last_gt_->pose.pose.position.z;
-    double d3d = std::sqrt(dx*dx + dy*dy + dz*dz);
+    double d3d = std::sqrt(dx * dx + dy * dy + dz * dz);
 
     errors_.push_back(d3d);
-    
     // We log the latest diagnostic values if they correspond to the same time (approx)
     log_file_ << msg->header.stamp.sec << "." << msg->header.stamp.nanosec << ","
               << dx << "," << dy << "," << dz << "," << d3d << ","
-              << last_gaussian_ << "," << last_nlos_ << "," << last_multipath_ << "," << last_drift_ << "\n";
+              << last_gaussian_ << "," << last_nlos_ << "," << last_multipath_ << "," <<
+      last_drift_ << "\n";
   }
 
   void diag_callback(const ros2_uwb_msgs::msg::UWBErrorDiagnostics::SharedPtr msg)

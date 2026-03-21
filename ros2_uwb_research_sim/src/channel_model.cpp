@@ -50,7 +50,7 @@ ChannelParams ChannelModel::getParamsByProfile(const std::string & profile)
     p.multipath_alpha = 0.80;   // Faster multipath
     p.multipath_sigma = 0.05;
     p.clock_drift_sigma = 0.0001;
-  } else { // "research" (default legacy settings)
+  } else {  // "research" (default legacy settings)
     p.gaussian_sigma = 0.02;
     p.nlos_lambda = 1.5;
     p.nlos_prob = 0.1;

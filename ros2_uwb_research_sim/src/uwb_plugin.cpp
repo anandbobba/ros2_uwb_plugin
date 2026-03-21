@@ -67,7 +67,7 @@ void UWBPlugin::Configure(
 
   // Predictable node name for each anchor link
   std::string node_name = "uwb_plugin_" + target_name_;
-  
+
   // Use sim time for synchronization with Gazebo clock
   auto options = rclcpp::NodeOptions();
   options.append_parameter_override("use_sim_time", true);
@@ -120,7 +120,8 @@ void UWBPlugin::Configure(
   }
 
   // Declare ROS parameters for runtime reconfiguration
-  std::string initial_profile = sdf->HasElement("noise_profile") ? sdf->Get<std::string>("noise_profile") : "custom";
+  std::string initial_profile = sdf->HasElement("noise_profile") ?
+    sdf->Get<std::string>("noise_profile") : "custom";
   ros_node_->declare_parameter("noise_profile", initial_profile);
 
   // Parameter callback to handle runtime changes
@@ -208,11 +209,11 @@ void UWBPlugin::PostUpdate(
 
   // Publish ROS2 message
   auto msg = sensor_msgs::msg::Range();
-  
+
   // Convert Ignition Gazebo simTime to ROS2 rclcpp::Time
   auto sim_nanos = std::chrono::duration_cast<std::chrono::nanoseconds>(info.simTime).count();
   rclcpp::Time current_sim_time(sim_nanos, RCL_ROS_TIME);
-  
+
   msg.header.stamp = current_sim_time;
   msg.header.frame_id = frame_id_;
   msg.radiation_type = sensor_msgs::msg::Range::ULTRASOUND;   // Using Range for UWB
@@ -229,12 +230,11 @@ void UWBPlugin::PostUpdate(
   std_range_msg.anchor_id = target_name_;
   std_range_msg.range = range_val;
   std_range_msg.std_dev = channel_->getParams().gaussian_sigma;
-  
+
   // Basic RSSI model: -40dBm at 1m, dropping by 20dB per decade
   double d_ref = std::max(1.0, m.d_true);
   std_range_msg.rssi = -40.0 - 20.0 * std::log10(d_ref);
-  std_range_msg.fpp = std_range_msg.rssi - 3.0; // Assume FPP is slightly lower
-  
+  std_range_msg.fpp = std_range_msg.rssi - 3.0;  // Assume FPP is slightly lower
   std_range_msg.is_nlos = (m.nlos_bias > 0.1);
   standardized_range_pub_->publish(std_range_msg);
 

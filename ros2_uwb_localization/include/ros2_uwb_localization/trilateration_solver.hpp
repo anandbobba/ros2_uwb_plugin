@@ -23,6 +23,7 @@
 #include <Eigen/Dense>
 #include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
 #include <rclcpp/rclcpp.hpp>
+
 #include "ros2_uwb_msgs/msg/uwb_multi_range.hpp"
 
 namespace ros2_uwb_localization
@@ -36,9 +37,8 @@ struct Anchor
 
 /**
  * @brief Standalone trilateration solver node.
- * 
  * Subscribes to /uwb/ranges_filtered (UWBMultiRange) and performs Gauss-Newton
- * iterative optimization to find the robot position. 
+ * iterative optimization to find the robot position.
  * Outlier rejection is applied based on solver residuals.
  */
 class TrilaterationSolver : public rclcpp::Node
@@ -49,12 +49,14 @@ public:
 private:
   void load_anchors_from_params();
   void multi_range_callback(const ros2_uwb_msgs::msg::UWBMultiRange::SharedPtr msg);
-  
+
   void solve_trilateration(
     const ros2_uwb_msgs::msg::UWBMultiRange::SharedPtr & msg,
     const std::vector<Anchor> & active_anchors);
 
-  void publish_pose(const rclcpp::Time & stamp, const Eigen::Vector3d & pos, const Eigen::Matrix3d & cov);
+  void publish_pose(
+    const rclcpp::Time & stamp, const Eigen::Vector3d & pos,
+    const Eigen::Matrix3d & cov);
 
   // Anchor configuration
   std::map<std::string, Anchor> anchors_;
