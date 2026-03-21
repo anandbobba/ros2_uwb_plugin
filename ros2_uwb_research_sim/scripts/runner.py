@@ -32,7 +32,7 @@ def run_experiment(config_file):
     exp_name = config['experiment']['name']
     duration = config['experiment']['duration']
 
-    print(f"Starting Experiment: {exp_name} for {duration} seconds...")
+    print(f'Starting Experiment: {exp_name} for {duration} seconds...')
 
     # 1. Start Simulation with remapped parameters (simplified for demo)
     # In a real setup, we would generate a custom SDF or pass params to launch
@@ -46,8 +46,8 @@ def run_experiment(config_file):
     for d in [csv_dir, res_dir]:
         os.makedirs(d, exist_ok=True)
 
-    print(f"Logs: {csv_dir}")
-    print(f"Results: {res_dir}")
+    print(f'Logs: {csv_dir}')
+    print(f'Results: {res_dir}')
 
     logger_cmd = [
         'ros2', 'run', 'ros2_uwb_research_sim', 'researcher_node.py',
@@ -57,7 +57,7 @@ def run_experiment(config_file):
     ]
 
     sim_proc = subprocess.Popen(launch_cmd)
-    print("Waiting 15s for Gazebo to start...")
+    print('Waiting 15s for Gazebo to start...')
     time.sleep(15)
 
     log_proc = subprocess.Popen(logger_cmd)
@@ -67,7 +67,7 @@ def run_experiment(config_file):
     except KeyboardInterrupt:
         pass
     finally:
-        print("Stopping experiment...")
+        print('Stopping experiment...')
         log_proc.send_signal(signal.SIGINT)
         sim_proc.send_signal(signal.SIGINT)
         log_proc.wait()
@@ -78,7 +78,7 @@ def run_experiment(config_file):
     if csv_files:
         latest_csv = sorted(csv_files)[-1]
         csv_path = os.path.join(csv_dir, latest_csv)
-        print(f"Processing data from {csv_path}...")
+        print(f'Processing data from {csv_path}...')
         subprocess.run([
             'ros2', 'run', 'ros2_uwb_research_sim', 'plotter.py',
             csv_path,
@@ -86,9 +86,9 @@ def run_experiment(config_file):
         ])
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import sys
     if len(sys.argv) < 2:
-        print("Usage: python3 runner.py <config_path>")
+        print('Usage: python3 runner.py <config_path>')
     else:
         run_experiment(sys.argv[1])

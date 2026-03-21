@@ -13,11 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import rclpy
+import threading
+
 from rclpy.node import Node
 from ros2_uwb_msgs.msg import UWBRange
+import rclpy
 import serial
-import threading
 
 
 class UWBSerialDriver(Node):
@@ -55,18 +56,18 @@ class UWBSerialDriver(Node):
             try:
                 self.ser = serial.Serial(self.port, self.baud, timeout=1.0)
                 self.get_logger().info(
-                    f"Connected to UWB hardware at {self.port} ({self.baud} baud)"
+                    f'Connected to UWB hardware at {self.port} ({self.baud} baud)'
                 )
             except serial.SerialException as e:
                 self.get_logger().error(
-                    f"Could not open port {self.port}. Is the hardware plugged in?"
+                    f'Could not open port {self.port}. Is the hardware plugged in?'
                 )
                 self.get_logger().error(
                     "TIP: Use 'ls /dev/tty*' to find your port, or set 'use_mock: True' in config."
                 )
                 raise e
         else:
-            self.get_logger().info("UWB Driver started in MOCK MODE (generating dummy data)")
+            self.get_logger().info('UWB Driver started in MOCK MODE (generating dummy data)')
 
         # Thread for reading / generating mock data
         self.stop_flag = False
@@ -85,11 +86,11 @@ class UWBSerialDriver(Node):
                         if line:
                             self.parse_line(line)
                 except Exception as e:
-                    self.get_logger().warn(f"Error reading serial data: {e}")
+                    self.get_logger().warn(f'Error reading serial data: {e}')
             elif self.use_mock:
                 # Generate realistic mock data: ANCHOR_ID,RANGE,RSSI
                 mock_range = 5.0 + random.uniform(-0.1, 0.1)
-                mock_line = f"uwb_anchor_0,{mock_range:.2f},-60"
+                mock_line = f'uwb_anchor_0,{mock_range:.2f},-60'
                 self.parse_line(mock_line)
                 time.sleep(0.1)  # 10Hz
 
@@ -121,7 +122,7 @@ class UWBSerialDriver(Node):
                 self.publisher.publish(msg)
 
             except ValueError:
-                self.get_logger().debug(f"Malformed serial data: {line}")
+                self.get_logger().debug(f'Malformed serial data: {line}')
 
     def destroy(self):
         """Safely stop the reading thread and close the serial port."""

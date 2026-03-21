@@ -44,8 +44,8 @@ class UWBResearcher(Node):
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)
 
-        self.csv_path = os.path.join(log_dir, f"{exp_name}_{int(time.time())}.csv")
-        self.get_logger().info(f"Logging to {self.csv_path}")
+        self.csv_path = os.path.join(log_dir, f'{exp_name}_{int(time.time())}.csv')
+        self.get_logger().info(f'Logging to {self.csv_path}')
 
         # CSV Setup
         self.csv_file = open(self.csv_path, 'w', newline='')
@@ -92,7 +92,7 @@ class UWBResearcher(Node):
         std = np.std(errors)
 
         self.get_logger().info(
-            f"Metrics: RMSE={rmse:.3f}, MAE={mae:.3f}, Bias={bias:.3f}, Std={std:.3f}")
+            f'Metrics: RMSE={rmse:.3f}, MAE={mae:.3f}, Bias={bias:.3f}, Std={std:.3f}')
 
     def __del__(self):
         """Close the CSV log file on node destruction."""

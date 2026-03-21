@@ -41,7 +41,7 @@ import sys
 
 
 class Anchor:
-    __slots__ = ("position", "range_m")
+    __slots__ = ('position', 'range_m')
 
     def __init__(self, x, y, z, range_m):
         self.position = (x, y, z)
@@ -181,24 +181,24 @@ def run_single_config(n_anchors, sigma, n_iters, rng):
 
 def print_table(results):
     """Print a formatted ASCII comparison table."""
-    hdr = (f"{'Anchors':>7}  {'σ(m)':>6}  "
-           f"{'RMSE(m)':>9}  {'MAE(m)':>8}  "
-           f"{'P90(m)':>8}  {'Conv%':>6}")
-    sep = "-" * len(hdr)
-    print("\n" + sep)
+    hdr = (f'{"Anchors":>7}  {"σ(m)":>6}  '
+           f'{"RMSE(m)":>9}  {"MAE(m)":>8}  '
+           f'{"P90(m)":>8}  {"Conv%":>6}')
+    sep = '-' * len(hdr)
+    print('\n' + sep)
     print(hdr)
     print(sep)
     for r in results:
-        print(f"{r['n_anchors']:>7}  {r['sigma_m']:>6.3f}  "
-              f"{r['rmse_m']:>9.4f}  {r['mae_m']:>8.4f}  "
-              f"{r['p90_m']:>8.4f}  {r['convergence_pct']:>6.1f}")
-    print(sep + "\n")
+        print(f'{r["n_anchors"]:>7}  {r["sigma_m"]:>6.3f}  '
+              f'{r["rmse_m"]:>9.4f}  {r["mae_m"]:>8.4f}  '
+              f'{r["p90_m"]:>8.4f}  {r["convergence_pct"]:>6.1f}')
+    print(sep + '\n')
 
 
 def save_csv(results, path):
     """Write results to a CSV file."""
-    fields = ["n_anchors", "sigma_m", "n_iters", "rmse_m", "mae_m",
-              "p90_m", "convergence_pct"]
+    fields = ['n_anchors', 'sigma_m', 'n_iters', 'rmse_m', 'mae_m',
+              'p90_m', 'convergence_pct']
     with open(path, 'w', newline='') as f:
         writer = csv.DictWriter(f, fieldnames=fields)
         writer.writeheader()
@@ -236,11 +236,11 @@ def main():
     csv_path = args.output or os.path.expanduser(
         f'~/position_accuracy_{timestamp}.csv')
 
-    print("\nUWB Position Accuracy Benchmark")
-    print(f"  Anchor counts  : {ANCHOR_COUNTS}")
-    print(f"  Noise levels   : {NOISE_LEVELS} m")
-    print(f"  Iters per cfg  : {args.iters}")
-    print(f"  Random seed    : {args.seed}\n")
+    print('\nUWB Position Accuracy Benchmark')
+    print(f'  Anchor counts  : {ANCHOR_COUNTS}')
+    print(f'  Noise levels   : {NOISE_LEVELS} m')
+    print(f'  Iters per cfg  : {args.iters}')
+    print(f'  Random seed    : {args.seed}\n')
 
     results = []
     total = len(ANCHOR_COUNTS) * len(NOISE_LEVELS)
@@ -248,23 +248,23 @@ def main():
     for n_anchors in ANCHOR_COUNTS:
         for sigma in NOISE_LEVELS:
             done += 1
-            sys.stdout.write(f"\r  Running [{done}/{total}]  "
-                             f"{n_anchors} anchors, σ={sigma:.3f} m ...    ")
+            sys.stdout.write(f'\r  Running [{done}/{total}]  '
+                             f'{n_anchors} anchors, σ={sigma:.3f} m ...    ')
             sys.stdout.flush()
             r = run_single_config(n_anchors, sigma, args.iters, rng)
             results.append(r)
 
-    print("")
+    print('')
     print_table(results)
     save_csv(results, csv_path)
 
     # Summary: best config by RMSE (excluding ideal σ=0)
-    noisy = [r for r in results if r["sigma_m"] > 0]
+    noisy = [r for r in results if r['sigma_m'] > 0]
     if noisy:
-        best = min(noisy, key=lambda r: r["rmse_m"])
-        print(f"Best noisy config → {best['n_anchors']} anchors, "
-              f"σ={best['sigma_m']} m  "
-              f"(RMSE={best['rmse_m']:.4f} m)")
+        best = min(noisy, key=lambda r: r['rmse_m'])
+        print(f'Best noisy config → {best["n_anchors"]} anchors, '
+              f'σ={best["sigma_m"]} m  '
+              f'(RMSE={best["rmse_m"]:.4f} m)')
 
 
 if __name__ == '__main__':

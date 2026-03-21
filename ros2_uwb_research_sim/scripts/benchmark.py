@@ -40,68 +40,68 @@ import sys
 # ---------------------------------------------------------------------------
 CONFIGS = [
     {
-        "name": "ideal",
-        "description": "No noise (ideal channel)",
-        "gaussian_sigma": 0.0,
-        "nlos_prob": 0.0,
-        "multipath_sigma": 0.0,
-        "clock_drift_sigma": 0.0,
+        'name': 'ideal',
+        'description': 'No noise (ideal channel)',
+        'gaussian_sigma': 0.0,
+        'nlos_prob': 0.0,
+        'multipath_sigma': 0.0,
+        'clock_drift_sigma': 0.0,
     },
     {
-        "name": "low_noise",
-        "description": "Low Gaussian noise (sigma=0.05m)",
-        "gaussian_sigma": 0.05,
-        "nlos_prob": 0.0,
-        "multipath_sigma": 0.0,
-        "clock_drift_sigma": 0.0,
+        'name': 'low_noise',
+        'description': 'Low Gaussian noise (sigma=0.05m)',
+        'gaussian_sigma': 0.05,
+        'nlos_prob': 0.0,
+        'multipath_sigma': 0.0,
+        'clock_drift_sigma': 0.0,
     },
     {
-        "name": "medium_noise",
-        "description": "Medium Gaussian noise (sigma=0.15m)",
-        "gaussian_sigma": 0.15,
-        "nlos_prob": 0.0,
-        "multipath_sigma": 0.0,
-        "clock_drift_sigma": 0.0,
+        'name': 'medium_noise',
+        'description': 'Medium Gaussian noise (sigma=0.15m)',
+        'gaussian_sigma': 0.15,
+        'nlos_prob': 0.0,
+        'multipath_sigma': 0.0,
+        'clock_drift_sigma': 0.0,
     },
     {
-        "name": "high_noise",
-        "description": "High Gaussian noise (sigma=0.30m)",
-        "gaussian_sigma": 0.30,
-        "nlos_prob": 0.0,
-        "multipath_sigma": 0.0,
-        "clock_drift_sigma": 0.0,
+        'name': 'high_noise',
+        'description': 'High Gaussian noise (sigma=0.30m)',
+        'gaussian_sigma': 0.30,
+        'nlos_prob': 0.0,
+        'multipath_sigma': 0.0,
+        'clock_drift_sigma': 0.0,
     },
     {
-        "name": "nlos_10pct",
-        "description": "Gaussian + 10% NLOS",
-        "gaussian_sigma": 0.10,
-        "nlos_prob": 0.10,
-        "multipath_sigma": 0.0,
-        "clock_drift_sigma": 0.0,
+        'name': 'nlos_10pct',
+        'description': 'Gaussian + 10% NLOS',
+        'gaussian_sigma': 0.10,
+        'nlos_prob': 0.10,
+        'multipath_sigma': 0.0,
+        'clock_drift_sigma': 0.0,
     },
     {
-        "name": "nlos_30pct",
-        "description": "Gaussian + 30% NLOS",
-        "gaussian_sigma": 0.10,
-        "nlos_prob": 0.30,
-        "multipath_sigma": 0.0,
-        "clock_drift_sigma": 0.0,
+        'name': 'nlos_30pct',
+        'description': 'Gaussian + 30% NLOS',
+        'gaussian_sigma': 0.10,
+        'nlos_prob': 0.30,
+        'multipath_sigma': 0.0,
+        'clock_drift_sigma': 0.0,
     },
     {
-        "name": "multipath",
-        "description": "Gaussian + multipath (alpha=0.5)",
-        "gaussian_sigma": 0.10,
-        "nlos_prob": 0.0,
-        "multipath_sigma": 0.08,
-        "clock_drift_sigma": 0.0,
+        'name': 'multipath',
+        'description': 'Gaussian + multipath (alpha=0.5)',
+        'gaussian_sigma': 0.10,
+        'nlos_prob': 0.0,
+        'multipath_sigma': 0.08,
+        'clock_drift_sigma': 0.0,
     },
     {
-        "name": "full_channel",
-        "description": "All noise sources active",
-        "gaussian_sigma": 0.10,
-        "nlos_prob": 0.15,
-        "multipath_sigma": 0.05,
-        "clock_drift_sigma": 0.002,
+        'name': 'full_channel',
+        'description': 'All noise sources active',
+        'gaussian_sigma': 0.10,
+        'nlos_prob': 0.15,
+        'multipath_sigma': 0.05,
+        'clock_drift_sigma': 0.002,
     },
 ]
 
@@ -156,30 +156,30 @@ def compute_metrics(csv_path: str) -> dict:
 def run_config(config: dict, output_dir: str, duration: int) -> dict:
     """Run a single benchmark configuration and return its metrics."""
     config = dict(config)
-    config["duration"] = duration
+    config['duration'] = duration
 
-    yaml_path = os.path.join(output_dir, f"{config['name']}.yaml")
-    csv_path = os.path.join(output_dir, f"{config['name']}.csv")
+    yaml_path = os.path.join(output_dir, f'{config["name"]}.yaml')
+    csv_path = os.path.join(output_dir, f'{config["name"]}.csv')
 
     write_experiment_yaml(config, yaml_path)
 
-    print(f"  Running '{config['name']}': {config['description']} ({duration}s)...")
+    print(f'  Running \'{config["name"]}\': {config["description"]} ({duration}s)...')
 
     try:
         result = subprocess.run(
-            ["ros2", "run", "ros2_uwb_research_sim", "runner.py",
-             "--config", yaml_path, "--output", csv_path],
+            ['ros2', 'run', 'ros2_uwb_research_sim', 'runner.py',
+             '--config', yaml_path, '--output', csv_path],
             timeout=duration + 30,
             capture_output=True,
             text=True,
         )
         if result.returncode != 0:
-            print(f"    [WARN] runner.py exited with code {result.returncode}")
+            print(f'    [WARN] runner.py exited with code {result.returncode}')
     except subprocess.TimeoutExpired:
-        print(f"    [WARN] '{config['name']}' timed out")
+        print(f'    [WARN] \'{config["name"]}\' timed out')
     except FileNotFoundError:
         # runner.py not available — generate synthetic data for demo
-        print("    [INFO] runner.py not found, generating synthetic metrics")
+        print('    [INFO] runner.py not found, generating synthetic metrics')
         _write_synthetic_csv(config, csv_path, n=500)
 
     metrics = compute_metrics(csv_path)
@@ -192,11 +192,11 @@ def _write_synthetic_csv(config: dict, csv_path: str, n: int = 500) -> None:
     """Generate synthetic range measurements for offline benchmarking."""
     import random
     rng = random.Random(42)
-    sigma = config["gaussian_sigma"]
-    nlos_prob = config["nlos_prob"]
+    sigma = config['gaussian_sigma']
+    nlos_prob = config['nlos_prob']
     nlos_lambda = 2.0
-    mp_sigma = config["multipath_sigma"]
-    drift_sigma = config["clock_drift_sigma"]
+    mp_sigma = config['multipath_sigma']
+    drift_sigma = config['clock_drift_sigma']
 
     mp_state = 0.0
     drift = 0.0
@@ -219,18 +219,18 @@ def _write_synthetic_csv(config: dict, csv_path: str, n: int = 500) -> None:
 def print_table(results: list) -> None:
     """Print a formatted comparison table."""
     header = (
-        f"{'Config':<20} {'Description':<40}"
-        f" {'RMSE(m)':>9} {'MAE(m)':>8} {'Bias(m)':>9} {'Std(m)':>8} {'N':>6}"
+        f'{"Config":<20} {"Description":<40}'
+        f' {"RMSE(m)":>9} {"MAE(m)":>8} {"Bias(m)":>9} {"Std(m)":>8} {"N":>6}'
     )
-    sep = "-" * len(header)
-    print("\n" + sep)
+    sep = '-' * len(header)
+    print('\n' + sep)
     print(header)
     print(sep)
     for r in results:
-        print(f"{r['name']:<20} {r['description']:<40} "
-              f"{r['rmse']:>9.4f} {r['mae']:>8.4f} "
-              f"{r['bias']:>9.4f} {r['std']:>8.4f} {r['n']:>6}")
-    print(sep + "\n")
+        print(f'{r["name"]:<20} {r["description"]:<40} '
+              f'{r["rmse"]:>9.4f} {r["mae"]:>8.4f} '
+              f'{r["bias"]:>9.4f} {r["std"]:>8.4f} {r["n"]:>6}')
+    print(sep + '\n')
 
 
 def save_summary(results: list, output_dir: str) -> None:
@@ -269,31 +269,31 @@ def main():
 
     configs = CONFIGS
     if args.configs:
-        configs = [c for c in CONFIGS if c["name"] in args.configs]
+        configs = [c for c in CONFIGS if c['name'] in args.configs]
         if not configs:
-            print(f"No matching configs. Available: {[c['name'] for c in CONFIGS]}")
+            print(f'No matching configs. Available: {[c["name"] for c in CONFIGS]}')
             sys.exit(1)
 
-    print("\nUWB Noise Model Benchmark")
-    print(f"  Configurations : {len(configs)}")
-    print(f"  Duration each  : {args.duration}s")
-    print(f"  Output dir     : {output_dir}\n")
+    print('\nUWB Noise Model Benchmark')
+    print(f'  Configurations : {len(configs)}')
+    print(f'  Duration each  : {args.duration}s')
+    print(f'  Output dir     : {output_dir}\n')
 
     results = []
     for config in configs:
         metrics = run_config(config, output_dir, args.duration)
         results.append(metrics)
-        print(f"    RMSE={metrics['rmse']:.4f}m  MAE={metrics['mae']:.4f}m  "
-              f"Bias={metrics['bias']:.4f}m  Std={metrics['std']:.4f}m  N={metrics['n']}")
+        print(f'    RMSE={metrics["rmse"]:.4f}m  MAE={metrics['mae']:.4f}m  '
+              f'Bias={metrics["bias"]:.4f}m  Std={metrics["std"]:.4f}m  N={metrics["n"]}')
 
     print_table(results)
     save_summary(results, output_dir)
 
     # Best config by RMSE
-    valid = [r for r in results if not math.isnan(r["rmse"]) and r["n"] > 0]
+    valid = [r for r in results if not math.isnan(r['rmse']) and r['n'] > 0]
     if valid:
-        best = min(valid, key=lambda r: r["rmse"])
-        print(f"Best configuration by RMSE: '{best['name']}' (RMSE={best['rmse']:.4f}m)")
+        best = min(valid, key=lambda r: r['rmse'])
+        print(f'Best configuration by RMSE: \'{best["name"]}\' (RMSE={best["rmse"]:.4f}m)')
 
 
 if __name__ == '__main__':
