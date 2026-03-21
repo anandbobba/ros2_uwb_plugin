@@ -283,7 +283,7 @@ def main():
     for config in configs:
         metrics = run_config(config, output_dir, args.duration)
         results.append(metrics)
-        print(f'    RMSE={metrics["rmse"]:.4f}m  MAE={metrics['mae']:.4f}m  '
+        print(f'    RMSE={metrics["rmse"]:.4f}m  MAE={metrics["mae"]:.4f}m  '
               f'Bias={metrics["bias"]:.4f}m  Std={metrics["std"]:.4f}m  N={metrics["n"]}')
 
     print_table(results)
