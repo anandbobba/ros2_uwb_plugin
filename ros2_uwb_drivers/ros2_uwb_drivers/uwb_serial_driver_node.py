@@ -15,9 +15,9 @@
 
 import threading
 
+import rclpy
 from rclpy.node import Node
 from ros2_uwb_msgs.msg import UWBRange
-import rclpy
 import serial
 
 
