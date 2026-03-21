@@ -26,14 +26,16 @@ GZ_ADD_PLUGIN(
   ros2_uwb_research_sim::UWBPlugin,
   gz::sim::System,
   ros2_uwb_research_sim::UWBPlugin::ISystemConfigure,
-  ros2_uwb_research_sim::UWBPlugin::ISystemPostUpdate
-)
+  ros2_uwb_research_sim::UWBPlugin::ISystemPostUpdate)
 
 namespace ros2_uwb_research_sim
 {
 
 UWBPlugin::UWBPlugin()
-: update_frequency_(10.0), last_update_time_(std::chrono::steady_clock::duration::zero()) {}
+  : update_frequency_(10.0),
+  last_update_time_(std::chrono::steady_clock::duration::zero())
+{
+}
 
 UWBPlugin::~UWBPlugin()
 {
@@ -152,8 +154,8 @@ void UWBPlugin::Configure(
     }
   });
 
-  gzmsg << "UWB Plugin configured for entity [" << entity << "]. Target: [" << target_name_ <<
-    "]" << std::endl;
+  gzmsg << "UWB Plugin configured for entity [" << entity << "]. "
+        << "Target: [" << target_name_ << "]" << std::endl;
 }
 
 void UWBPlugin::PostUpdate(

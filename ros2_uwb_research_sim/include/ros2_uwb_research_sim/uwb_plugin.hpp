@@ -15,20 +15,20 @@
 #ifndef ROS2_UWB_RESEARCH_SIM__UWB_PLUGIN_HPP_
 #define ROS2_UWB_RESEARCH_SIM__UWB_PLUGIN_HPP_
 
+#include <atomic>
+#include <chrono>
 #include <memory>
 #include <string>
-#include <vector>
-#include <chrono>
 #include <thread>
-#include <atomic>
+#include <vector>
 
 #include <gz/sim/System.hh>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/range.hpp>
+
 #include "ros2_uwb_msgs/msg/uwb_range.hpp"
 #include "ros2_uwb_msgs/msg/uwb_error_diagnostics.hpp"
 #include "ros2_uwb_research_sim/msg/uwb_research_data.hpp"
-
 #include "ros2_uwb_research_sim/channel_model.hpp"
 
 // GZ/Ignition Compatibility Shim

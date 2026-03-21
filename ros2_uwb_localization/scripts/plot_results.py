@@ -1,11 +1,27 @@
-#!/usr/bin/env python3
+# Copyright 2026 Anand Bobba
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import os
+import sys
+
 import matplotlib
-matplotlib.use('Agg')  # Non-interactive backend — saves PNG without needing a display
-import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-import sys
-import os
+import pandas as pd
+
+matplotlib.use('Agg')  # Non-interactive backend — saves PNG without needing a display
+
 
 def main():
     if len(sys.argv) < 2:
@@ -18,7 +34,7 @@ def main():
         return
 
     df = pd.read_csv(csv_path)
-    
+
     # Accuracy Stats
     errors = df['error_3d'].values
     rmse = np.sqrt(np.mean(errors**2))
@@ -33,7 +49,7 @@ def main():
 
     # Plot Distribution
     plt.figure(figsize=(10, 5))
-    
+
     # 1. Error over time
     plt.subplot(1, 2, 1)
     plt.plot(df['timestamp'] - df['timestamp'].iloc[0], df['error_3d'], label='3D Error')
@@ -57,6 +73,7 @@ def main():
     plt.savefig(output_png)
     print(f"Plot saved to: {output_png}")
     # plt.show()  # Disabled: use a viewer like 'eog' or 'xdg-open' to view the saved PNG
+
 
 if __name__ == '__main__':
     main()

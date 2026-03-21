@@ -27,6 +27,7 @@ class UWBSerialDriver(Node):
     """
 
     def __init__(self):
+        """Initialize parameters, publishers, and serial connection."""
         super().__init__('uwb_serial_driver')
 
         # Parameters
@@ -52,10 +53,16 @@ class UWBSerialDriver(Node):
         if not self.use_mock:
             try:
                 self.ser = serial.Serial(self.port, self.baud, timeout=1.0)
-                self.get_logger().info(f"Connected to UWB hardware at {self.port} ({self.baud} baud)")
+                self.get_logger().info(
+                    f"Connected to UWB hardware at {self.port} ({self.baud} baud)"
+                )
             except serial.SerialException as e:
-                self.get_logger().error(f"Could not open port {self.port}. Is the hardware plugged in?")
-                self.get_logger().error("TIP: Use 'ls /dev/tty*' to find your port, or set 'use_mock: True' in config.")
+                self.get_logger().error(
+                    f"Could not open port {self.port}. Is the hardware plugged in?"
+                )
+                self.get_logger().error(
+                    "TIP: Use 'ls /dev/tty*' to find your port, or set 'use_mock: True' in config."
+                )
                 raise e
         else:
             self.get_logger().info("UWB Driver started in MOCK MODE (generating dummy data)")
@@ -66,6 +73,7 @@ class UWBSerialDriver(Node):
         self.thread.start()
 
     def read_loop(self):
+        """Main loop for reading serial data or generating mock pulses."""
         import time
         import random
         while rclpy.ok() and not self.stop_flag:
@@ -114,6 +122,7 @@ class UWBSerialDriver(Node):
                 self.get_logger().debug(f"Malformed serial data: {line}")
 
     def destroy(self):
+        """Safely stop the reading thread and close the serial port."""
         self.stop_flag = True
         if self.thread and self.thread.is_alive():
             self.thread.join()
@@ -121,7 +130,9 @@ class UWBSerialDriver(Node):
             self.ser.close()
         super().destroy_node()
 
+
 def main(args=None):
+    """Entry point for the UWB Serial Driver node."""
     rclpy.init(args=args)
     try:
         node = UWBSerialDriver()

@@ -15,12 +15,12 @@
 #ifndef ROS2_UWB_LOCALIZATION__RANGE_PREPROCESSOR_HPP_
 #define ROS2_UWB_LOCALIZATION__RANGE_PREPROCESSOR_HPP_
 
+#include <map>
+#include <string>
+
 #include <rclcpp/rclcpp.hpp>
 #include "ros2_uwb_msgs/msg/uwb_range.hpp"
 #include "ros2_uwb_msgs/msg/uwb_multi_range.hpp"
-
-#include <map>
-#include <string>
 
 namespace ros2_uwb_localization
 {

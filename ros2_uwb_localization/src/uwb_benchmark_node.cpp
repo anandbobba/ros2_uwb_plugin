@@ -12,19 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <algorithm>
+#include <cmath>
+#include <fstream>
+#include <iostream>
+#include <map>
+#include <numeric>
+#include <vector>
+
 #include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include "ros2_uwb_msgs/msg/uwb_error_diagnostics.hpp"
-
-#include <vector>
-#include <cmath>
-#include <fstream>
-#include <iostream>
-#include <numeric>
-#include <algorithm>
-#include <map>
 
 namespace ros2_uwb_localization
 {
@@ -35,7 +35,8 @@ namespace ros2_uwb_localization
 class BenchmarkNode : public rclcpp::Node
 {
 public:
-  BenchmarkNode() : Node("uwb_benchmark_node")
+  BenchmarkNode()
+  : Node("uwb_benchmark_node")
   {
     this->declare_parameter("gt_topic", "/ground_truth/pose");
     this->declare_parameter("est_topic", "/uwb/pose");
@@ -166,7 +167,9 @@ private:
   rclcpp::Subscription<ros2_uwb_msgs::msg::UWBErrorDiagnostics>::SharedPtr diag_sub_;
 };
 
-} // namespace ros2_uwb_localization
+
+}  // namespace ros2_uwb_localization
+
 
 int main(int argc, char ** argv)
 {

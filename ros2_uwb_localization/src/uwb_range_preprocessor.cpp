@@ -16,8 +16,8 @@
 
 namespace ros2_uwb_localization
 {
-
-RangePreprocessor::RangePreprocessor() : Node("uwb_range_preprocessor")
+RangePreprocessor::RangePreprocessor()
+  : Node("uwb_range_preprocessor")
 {
   this->declare_parameter("publish_rate", 20.0);
   this->declare_parameter("range_timeout", 0.5);
@@ -37,7 +37,6 @@ RangePreprocessor::RangePreprocessor() : Node("uwb_range_preprocessor")
     "/uwb/range", 10,
     std::bind(&RangePreprocessor::range_callback, this, std::placeholders::_1));
 
-  // Multi-range filtered output
   // Multi-range filtered output
   multi_range_pub_ = this->create_publisher<ros2_uwb_msgs::msg::UWBMultiRange>(
     "/uwb/ranges_filtered", 10);
@@ -61,9 +60,13 @@ RangePreprocessor::RangePreprocessor() : Node("uwb_range_preprocessor")
       return result;
     });
   double rate = this->get_parameter("publish_rate").as_double();
-  RCLCPP_INFO(this->get_logger(), "UWB Range Preprocessor initialized at %.1f Hz (Event-Driven)", rate);
-  RCLCPP_INFO(this->get_logger(), " - Params: timeout=%.2fs, min_range=%.1f, max_range=%.1f", 
-              range_timeout_, min_range_, max_range_);
+  RCLCPP_INFO(
+    this->get_logger(),
+    "UWB Range Preprocessor initialized at %.1f Hz (Event-Driven)", rate);
+  RCLCPP_INFO(
+    this->get_logger(),
+    " - Params: timeout=%.2fs, min_range=%.1f, max_range=%.1f",
+    range_timeout_, min_range_, max_range_);
 }
 
 void RangePreprocessor::range_callback(const ros2_uwb_msgs::msg::UWBRange::SharedPtr msg)
@@ -83,14 +86,16 @@ void RangePreprocessor::range_callback(const ros2_uwb_msgs::msg::UWBRange::Share
   entry.last_msg = *msg;
   entry.last_update = this->now();
   entry.valid = true;
-  
+
   range_cache_[msg->anchor_id] = entry;
 
   // Log every 10 messages to avoid spam but confirm life
   static int count = 0;
   if (++count % 10 == 0) {
-    RCLCPP_INFO(this->get_logger(), "Received range from [%s]: %.3f m", 
-                msg->anchor_id.c_str(), msg->range);
+    RCLCPP_INFO(
+      this->get_logger(),
+      "Received range from [%s]: %.3f m",
+      msg->anchor_id.c_str(), msg->range);
   }
 
   // EVENT-DRIVEN PUBLISH: Immediately aggregate and publish

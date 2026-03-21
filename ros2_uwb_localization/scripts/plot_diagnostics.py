@@ -1,11 +1,27 @@
-#!/usr/bin/env python3
+# Copyright 2026 Anand Bobba
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import os
+import sys
+
 import matplotlib
-matplotlib.use('Agg')  # Non-interactive backend — saves PNG without needing a display
-import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-import sys
-import os
+import pandas as pd
+
+matplotlib.use('Agg')  # Non-interactive backend — saves PNG without needing a display
+
 
 def main():
     if len(sys.argv) < 2:
@@ -18,25 +34,28 @@ def main():
         return
 
     df = pd.read_csv(csv_path)
-    
+
     # 1. Error Attribution Pie Chart
     # Use absolute values for contribution
     sources = ['gaussian', 'nlos', 'multipath', 'drift']
     # Filter columns that exist
     sources = [s for s in sources if s in df.columns]
-    
+
     if not sources:
         print("No diagnostic columns found in CSV. Use standard plot_results.py instead.")
         return
 
     total_errs = df[sources].abs().sum()
-    
+
     plt.figure(figsize=(15, 10))
-    
+
     # Grid: 2x2
     # 1. Pie Chart
     plt.subplot(2, 2, 1)
-    plt.pie(total_errs, labels=total_errs.index, autopct='%1.1f%%', startangle=140, colors=['#66b3ff','#99ff99','#ffcc99','#ff9999'])
+    plt.pie(
+        total_errs, labels=total_errs.index, autopct='%1.1f%%', startangle=140,
+        colors=['#66b3ff', '#99ff99', '#ffcc99', '#ff9999']
+    )
     plt.title('Error Source Attribution (%)')
 
     # 2. Stacked Error over Time
@@ -80,6 +99,7 @@ def main():
     plt.savefig(output_png)
     print(f"Diagnostic plots saved to: {output_png}")
     # plt.show()  # Disabled: use 'xdg-open <file>.png' to view
+
 
 if __name__ == '__main__':
     main()

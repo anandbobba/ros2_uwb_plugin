@@ -22,7 +22,7 @@ namespace ros2_uwb_localization
 {
 
 TrilaterationSolver::TrilaterationSolver()
-: Node("uwb_trilateration_solver")
+  : Node("uwb_trilateration_solver")
 {
   this->declare_parameter("output_frame", "map");
   this->declare_parameter("min_anchors", 3);
@@ -45,7 +45,9 @@ TrilaterationSolver::TrilaterationSolver()
   tag_height_ = this->get_parameter("tag_height").as_double();
 
   if (two_d_mode_) {
-    RCLCPP_INFO(this->get_logger(), "2D mode enabled: z constrained to %.3f m", tag_height_);
+    RCLCPP_INFO(
+      this->get_logger(),
+      "2D mode enabled: z constrained to %.3f m", tag_height_);
   }
 
   load_anchors_from_params();
@@ -112,7 +114,9 @@ void TrilaterationSolver::load_anchors_from_params()
     anchor.position = Eigen::Vector3d(pos[0], pos[1], pos[2]);
     anchors_[anchor_id] = anchor;
   }
-  RCLCPP_INFO(this->get_logger(), "Loaded %zu UWB anchors from parameters", anchors_.size());
+  RCLCPP_INFO(
+    this->get_logger(),
+    "Loaded %zu UWB anchors from parameters", anchors_.size());
 }
 
 void TrilaterationSolver::multi_range_callback(const ros2_uwb_msgs::msg::UWBMultiRange::SharedPtr msg)
@@ -129,8 +133,10 @@ void TrilaterationSolver::multi_range_callback(const ros2_uwb_msgs::msg::UWBMult
   }
 
   if (static_cast<int>(active.size()) < min_anchors_) {
-    RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 2000,
-      "Insufficient active anchors (%zu/%d). Localization paused.", active.size(), min_anchors_);
+    RCLCPP_WARN_THROTTLE(
+      this->get_logger(), *this->get_clock(), 2000,
+      "Insufficient active anchors (%zu/%d). Localization paused.",
+      active.size(), min_anchors_);
     return;
   }
 

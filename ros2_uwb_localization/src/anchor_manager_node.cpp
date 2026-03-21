@@ -12,16 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//
-// Anchor Manager Node
-// -------------------
-// Loads UWB anchor positions from ROS2 parameters and broadcasts static TF
-// frames for each anchor. This enables other nodes (trilateration, visualization)
-// to discover anchor positions via TF or parameter sharing.
-
 #include "ros2_uwb_localization/anchor_manager_node.hpp"
 
 #include <chrono>
+#include <functional>
 
 using namespace std::chrono_literals;
 
@@ -61,7 +55,7 @@ void AnchorManagerNode::load_anchors_from_params()
   // Try to load anchors from parameters. Supports both:
   // 1. Map-based: anchors.anchor_0...
   // 2. Index-based: anchors.0... (more idiomatic for lists)
-  
+
   for (int i = 0; i < 32; ++i) {
     std::string anchor_id = "";
     std::vector<double> pos;
