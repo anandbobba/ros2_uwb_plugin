@@ -25,12 +25,12 @@ matplotlib.use('Agg')  # Non-interactive backend — saves PNG without needing a
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python3 plot_results.py <benchmark_csv>")
+        print('Usage: python3 plot_results.py <benchmark_csv>')
         return
 
     csv_path = sys.argv[1]
     if not os.path.exists(csv_path):
-        print(f"File not found: {csv_path}")
+        print(f'File not found: {csv_path}')
         return
 
     df = pd.read_csv(csv_path)
@@ -41,11 +41,11 @@ def main():
     mae = np.mean(errors)
     p95 = np.percentile(errors, 95)
 
-    print(f"--- Statistics for {os.path.basename(csv_path)} ---")
-    print(f"Samples: {len(errors)}")
-    print(f"RMSE:    {rmse:.4f} m")
-    print(f"MAE:     {mae:.4f} m")
-    print(f"P95:     {p95:.4f} m")
+    print(f'--- Statistics for {os.path.basename(csv_path)} ---')
+    print(f'Samples: {len(errors)}')
+    print(f'RMSE:    {rmse:.4f} m')
+    print(f'MAE:     {mae:.4f} m')
+    print(f'P95:     {p95:.4f} m')
 
     # Plot Distribution
     plt.figure(figsize=(10, 5))
@@ -71,7 +71,7 @@ def main():
     plt.tight_layout()
     output_png = csv_path.replace('.csv', '_plot.png')
     plt.savefig(output_png)
-    print(f"Plot saved to: {output_png}")
+    print(f'Plot saved to: {output_png}')
     # plt.show()  # Disabled: use a viewer like 'eog' or 'xdg-open' to view the saved PNG
 
 

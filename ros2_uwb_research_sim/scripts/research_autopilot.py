@@ -14,9 +14,9 @@
 
 """Circular autopilot for UWB research evaluation."""
 
+from geometry_msgs.msg import Twist
 import rclpy
 from rclpy.node import Node
-from geometry_msgs.msg import Twist
 
 
 class ResearchAutopilot(Node):

@@ -25,12 +25,12 @@ matplotlib.use('Agg')  # Non-interactive backend — saves PNG without needing a
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python3 plot_diagnostics.py <benchmark_csv>")
+        print('Usage: python3 plot_diagnostics.py <benchmark_csv>')
         return
 
     csv_path = sys.argv[1]
     if not os.path.exists(csv_path):
-        print(f"File not found: {csv_path}")
+        print(f'File not found: {csv_path}')
         return
 
     df = pd.read_csv(csv_path)
@@ -42,7 +42,7 @@ def main():
     sources = [s for s in sources if s in df.columns]
 
     if not sources:
-        print("No diagnostic columns found in CSV. Use standard plot_results.py instead.")
+        print('No diagnostic columns found in CSV. Use standard plot_results.py instead.')
         return
 
     total_errs = df[sources].abs().sum()
@@ -97,7 +97,7 @@ def main():
     plt.tight_layout()
     output_png = csv_path.replace('.csv', '_diagnostics.png')
     plt.savefig(output_png)
-    print(f"Diagnostic plots saved to: {output_png}")
+    print(f'Diagnostic plots saved to: {output_png}')
     # plt.show()  # Disabled: use 'xdg-open <file>.png' to view
 
 

@@ -45,9 +45,9 @@ try:
     from geometry_msgs.msg import Quaternion
     from rosgraph_msgs.msg import Clock
 except ImportError as e:
-    print(f"[ERROR] Missing ROS2 Python packages: {e}")
-    print("        Run:  source /opt/ros/humble/setup.bash")
-    print("              source <workspace>/install/setup.bash")
+    print(f'[ERROR] Missing ROS2 Python packages: {e}')
+    print('        Run:  source /opt/ros/humble/setup.bash')
+    print('              source <workspace>/install/setup.bash')
     sys.exit(1)
 
 
@@ -55,10 +55,10 @@ except ImportError as e:
 # Anchor layout (must match anchors.yaml)
 # ---------------------------------------------------------------------------
 ANCHORS = [
-    ("uwb_anchor_0", (5.0, 5.0, 2.0)),
-    ("uwb_anchor_1", (-5.0, 5.0, 2.0)),
-    ("uwb_anchor_2", (5.0, -5.0, 2.0)),
-    ("uwb_anchor_3", (-5.0, -5.0, 2.0)),
+    ('uwb_anchor_0', (5.0, 5.0, 2.0)),
+    ('uwb_anchor_1', (-5.0, 5.0, 2.0)),
+    ('uwb_anchor_2', (5.0, -5.0, 2.0)),
+    ('uwb_anchor_3', (-5.0, -5.0, 2.0)),
 ]
 
 # ---------------------------------------------------------------------------
@@ -115,8 +115,8 @@ def write_bag(output_dir, duration_s, radius_m, dt, rng):
     period = duration_s              # seconds for one full circle
     drift = 0.0
 
-    print(f"  Generating {n_steps} steps × {len(ANCHORS)} anchors "
-          f"({duration_s:.0f}s at {1.0 / dt:.0f} Hz)...")
+    print(f'  Generating {n_steps} steps × {len(ANCHORS)} anchors '
+          f'({duration_s:.0f}s at {1.0 / dt:.0f} Hz)...')
 
     for step in range(n_steps):
         t_s = step * dt
@@ -171,7 +171,7 @@ def write_bag(output_dir, duration_s, radius_m, dt, rng):
                          serialize_message(range_msg), stamp_ns)
 
     del writer   # flush & close
-    print(f"  Bag written to: {output_dir}/")
+    print(f'  Bag written to: {output_dir}/')
 
 
 def _add_topic(writer, topic, msg_type):
@@ -189,23 +189,23 @@ def _add_topic(writer, topic, msg_type):
 def parse_args():
     """Parse CLI arguments."""
     parser = argparse.ArgumentParser(
-        description="Generate a synthetic ROS2 UWB demo bag (no Gazebo needed)")
+        description='Generate a synthetic ROS2 UWB demo bag (no Gazebo needed)')
     parser.add_argument(
-        "--output", type=str,
-        default=os.path.expanduser("~/ros2_uwb_demo_bag"),
-        help="Output bag directory (default: ~/ros2_uwb_demo_bag)")
+        '--output', type=str,
+        default=os.path.expanduser('~/ros2_uwb_demo_bag'),
+        help='Output bag directory (default: ~/ros2_uwb_demo_bag)')
     parser.add_argument(
-        "--duration", type=float, default=60.0,
-        help="Simulation duration in seconds (default: 60.0)")
+        '--duration', type=float, default=60.0,
+        help='Simulation duration in seconds (default: 60.0)')
     parser.add_argument(
-        "--radius", type=float, default=3.0,
-        help="Robot circular path radius in metres (default: 3.0)")
+        '--radius', type=float, default=3.0,
+        help='Robot circular path radius in metres (default: 3.0)')
     parser.add_argument(
-        "--rate", type=float, default=10.0,
-        help="UWB measurement rate in Hz (default: 10.0)")
+        '--rate', type=float, default=10.0,
+        help='UWB measurement rate in Hz (default: 10.0)')
     parser.add_argument(
-        "--seed", type=int, default=42,
-        help="Random seed (default: 42)")
+        '--seed', type=int, default=42,
+        help='Random seed (default: 42)')
     return parser.parse_args()
 
 
@@ -215,24 +215,24 @@ def main():
     rng = random.Random(args.seed)
     dt = 1.0 / args.rate
 
-    print("\nUWB Synthetic Demo Bag Generator")
-    print(f"  Output     : {args.output}")
-    print(f"  Duration   : {args.duration:.0f} s")
-    print(f"  Radius     : {args.radius:.1f} m")
-    print(f"  Rate       : {args.rate:.0f} Hz")
-    print(f"  Anchors    : {len(ANCHORS)}")
-    print(f"  Noise σ    : {GAUSSIAN_SIGMA:.3f} m (Gaussian)")
-    print("")
+    print('\nUWB Synthetic Demo Bag Generator')
+    print(f'  Output     : {args.output}')
+    print(f'  Duration   : {args.duration:.0f} s')
+    print(f'  Radius     : {args.radius:.1f} m')
+    print(f'  Rate       : {args.rate:.0f} Hz')
+    print(f'  Anchors    : {len(ANCHORS)}')
+    print(f'  Noise σ    : {GAUSSIAN_SIGMA:.3f} m (Gaussian)')
+    print('')
 
     t0 = time.monotonic()
     write_bag(args.output, args.duration, args.radius, dt, rng)
     elapsed = time.monotonic() - t0
 
-    print(f"  Done in {elapsed:.1f}s.\n")
-    print("Replay this bag with:")
-    print(f"  ros2 launch ros2_uwb_localization play_bag.launch.py "
-          f"bag_path:={args.output}\n")
+    print(f'  Done in {elapsed:.1f}s.\n')
+    print('Replay this bag with:')
+    print(f'  ros2 launch ros2_uwb_localization play_bag.launch.py '
+          f'bag_path:={args.output}\n')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

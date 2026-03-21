@@ -28,11 +28,11 @@
 
 import argparse
 import csv
+from datetime import datetime
 import math
 import os
 import subprocess
 import sys
-from datetime import datetime
 
 
 # ---------------------------------------------------------------------------
@@ -108,14 +108,14 @@ CONFIGS = [
 
 def write_experiment_yaml(config: dict, path: str) -> None:
     """Write a temporary experiment YAML for runner.py."""
-    with open(path, "w") as f:
+    with open(path, 'w') as f:
         f.write(f"name: {config['name']}\n")
         f.write(f"duration: {config.get('duration', 20)}\n")
-        f.write("uwb:\n")
+        f.write('uwb:\n')
         f.write(f"  gaussian_sigma: {config['gaussian_sigma']}\n")
         f.write(f"  nlos_prob: {config['nlos_prob']}\n")
-        f.write("  nlos_lambda: 2.0\n")
-        f.write("  multipath_alpha: 0.5\n")
+        f.write('  nlos_lambda: 2.0\n')
+        f.write('  multipath_alpha: 0.5\n')
         f.write(f"  multipath_sigma: {config['multipath_sigma']}\n")
         f.write(f"  clock_drift_sigma: {config['clock_drift_sigma']}\n")
 
@@ -127,16 +127,16 @@ def compute_metrics(csv_path: str) -> dict:
         with open(csv_path) as f:
             reader = csv.DictReader(f)
             for row in reader:
-                gt = float(row["ground_truth"])
-                meas = float(row["measured"])
+                gt = float(row['ground_truth'])
+                meas = float(row['measured'])
                 errors.append(meas - gt)
     except (FileNotFoundError, KeyError, ValueError):
-        return {"rmse": float("nan"), "mae": float("nan"),
-                "bias": float("nan"), "std": float("nan"), "n": 0}
+        return {'rmse': float('nan'), 'mae': float('nan'),
+                'bias': float('nan'), 'std': float('nan'), 'n': 0}
 
     if not errors:
-        return {"rmse": float("nan"), "mae": float("nan"),
-                "bias": float("nan"), "std": float("nan"), "n": 0}
+        return {'rmse': float('nan'), 'mae': float('nan'),
+                'bias': float('nan'), 'std': float('nan'), 'n': 0}
 
     n = len(errors)
     mean_err = sum(errors) / n
@@ -145,11 +145,11 @@ def compute_metrics(csv_path: str) -> dict:
     variance = sum((e - mean_err) ** 2 for e in errors) / n
 
     return {
-        "rmse": rmse,
-        "mae": mae,
-        "bias": mean_err,
-        "std": math.sqrt(variance),
-        "n": n,
+        'rmse': rmse,
+        'mae': mae,
+        'bias': mean_err,
+        'std': math.sqrt(variance),
+        'n': n,
     }
 
 
@@ -183,8 +183,8 @@ def run_config(config: dict, output_dir: str, duration: int) -> dict:
         _write_synthetic_csv(config, csv_path, n=500)
 
     metrics = compute_metrics(csv_path)
-    metrics["name"] = config["name"]
-    metrics["description"] = config["description"]
+    metrics['name'] = config['name']
+    metrics['description'] = config['description']
     return metrics
 
 
@@ -202,17 +202,17 @@ def _write_synthetic_csv(config: dict, csv_path: str, n: int = 500) -> None:
     drift = 0.0
     true_dist = 5.0  # fixed for benchmark
 
-    with open(csv_path, "w", newline="") as f:
+    with open(csv_path, 'w', newline='') as f:
         writer = csv.writer(f)
-        writer.writerow(["timestamp", "anchor_id", "ground_truth", "measured",
-                         "gaussian_noise", "nlos_bias", "multipath_error", "clock_drift"])
+        writer.writerow(['timestamp', 'anchor_id', 'ground_truth', 'measured',
+                         'gaussian_noise', 'nlos_bias', 'multipath_error', 'clock_drift'])
         for i in range(n):
             g_noise = rng.gauss(0, sigma)
             nlos = rng.expovariate(nlos_lambda) if rng.random() < nlos_prob else 0.0
             mp_state = 0.5 * mp_state + rng.gauss(0, mp_sigma)
             drift += rng.gauss(0, drift_sigma)
             measured = true_dist + g_noise + nlos + mp_state + drift
-            writer.writerow([i * 0.05, "A0", true_dist, measured,
+            writer.writerow([i * 0.05, 'A0', true_dist, measured,
                              g_noise, nlos, mp_state, drift])
 
 
@@ -235,27 +235,27 @@ def print_table(results: list) -> None:
 
 def save_summary(results: list, output_dir: str) -> None:
     """Write benchmark summary CSV."""
-    path = os.path.join(output_dir, "benchmark_summary.csv")
-    with open(path, "w", newline="") as f:
-        fields = ["name", "description", "rmse", "mae", "bias", "std", "n"]
+    path = os.path.join(output_dir, 'benchmark_summary.csv')
+    with open(path, 'w', newline='') as f:
+        fields = ['name', 'description', 'rmse', 'mae', 'bias', 'std', 'n']
         writer = csv.DictWriter(f, fieldnames=fields)
         writer.writeheader()
         writer.writerows(results)
-    print(f"Summary saved to: {path}")
+    print(f'Summary saved to: {path}')
 
 
 def parse_args():
     """Parse command-line arguments."""
     parser = argparse.ArgumentParser(
-        description="Benchmark UWB noise models across configurations")
-    parser.add_argument("--duration", type=int, default=20,
-                        help="Duration (seconds) per configuration (default: 20)")
+        description='Benchmark UWB noise models across configurations')
+    parser.add_argument('--duration', type=int, default=20,
+                        help='Duration (seconds) per configuration (default: 20)')
     parser.add_argument(
-        "--output", type=str, default=None,
-        help="Output directory for results"
-             " (default: ~/ros2_uwb_benchmark_<timestamp>)")
-    parser.add_argument("--configs", nargs="+", default=None,
-                        help="Subset of config names to run (default: all)")
+        '--output', type=str, default=None,
+        help='Output directory for results'
+             ' (default: ~/ros2_uwb_benchmark_<timestamp>)')
+    parser.add_argument('--configs', nargs='+', default=None,
+                        help='Subset of config names to run (default: all)')
     return parser.parse_args()
 
 
@@ -263,8 +263,8 @@ def main():
     """Run the benchmark sweep and print results."""
     args = parse_args()
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_dir = args.output or os.path.expanduser(f"~/ros2_uwb_benchmark_{timestamp}")
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    output_dir = args.output or os.path.expanduser(f'~/ros2_uwb_benchmark_{timestamp}')
     os.makedirs(output_dir, exist_ok=True)
 
     configs = CONFIGS
@@ -296,5 +296,5 @@ def main():
         print(f"Best configuration by RMSE: '{best['name']}' (RMSE={best['rmse']:.4f}m)")
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

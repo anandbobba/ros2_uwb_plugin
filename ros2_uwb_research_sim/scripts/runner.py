@@ -16,11 +16,12 @@
 
 """Run a UWB simulation experiment from a YAML config and collect CSV results."""
 
-import subprocess
 import os
-import yaml
-import time
 import signal
+import subprocess
+import time
+
+import yaml
 
 
 def run_experiment(config_file):

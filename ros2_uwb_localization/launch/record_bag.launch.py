@@ -31,9 +31,10 @@
 #   /clock              Simulation clock
 """Run the full demo and record all localization topics to a ROS bag."""
 
-import os
 from datetime import datetime
-from ament_index_python.packages import get_package_share_directory, get_package_prefix
+import os
+
+from ament_index_python.packages import get_package_prefix, get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import (
     DeclareLaunchArgument,

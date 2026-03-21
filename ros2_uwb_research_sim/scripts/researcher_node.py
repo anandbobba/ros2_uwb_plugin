@@ -16,13 +16,15 @@
 
 """ROS2 node that subscribes to UWB research data and logs it to CSV."""
 
-import rclpy
-from rclpy.node import Node
 import csv
 import os
 import time
-from ros2_uwb_research_sim.msg import UWBResearchData
+
 import numpy as np
+import rclpy
+from rclpy.node import Node
+
+from ros2_uwb_research_sim.msg import UWBResearchData
 
 
 class UWBResearcher(Node):

@@ -16,11 +16,12 @@
 
 """Analyze and plot UWB range error metrics from a researcher_node CSV file."""
 
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 import os
 import sys
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 
 
 def analyze_and_plot(csv_path, output_dir):
@@ -43,7 +44,7 @@ def analyze_and_plot(csv_path, output_dir):
     # Save Metrics
     with open(os.path.join(output_dir, 'metrics.txt'), 'w') as f:
         for k, v in metrics.items():
-            f.write(f"{k}: {v:.5f}\n")
+            f.write(f'{k}: {v:.5f}\n')
 
     # Plots
     plt.figure(figsize=(15, 10))
@@ -90,11 +91,11 @@ def analyze_and_plot(csv_path, output_dir):
     plt.savefig(os.path.join(output_dir, 'analysis.png'))
     plt.close()
 
-    print(f"Analysis complete. Results saved in {output_dir}")
+    print(f'Analysis complete. Results saved in {output_dir}')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     if len(sys.argv) < 3:
-        print("Usage: python3 plotter.py <csv_path> <output_dir>")
+        print('Usage: python3 plotter.py <csv_path> <output_dir>')
     else:
         analyze_and_plot(sys.argv[1], sys.argv[2])

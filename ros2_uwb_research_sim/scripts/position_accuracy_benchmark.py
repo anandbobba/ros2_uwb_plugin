@@ -29,11 +29,11 @@
 
 import argparse
 import csv
+from datetime import datetime
 import math
 import os
 import random
 import sys
-from datetime import datetime
 
 # ---------------------------------------------------------------------------
 # Gauss-Newton trilateration solver (mirrors TrilaterationNode logic)
@@ -165,13 +165,13 @@ def run_single_config(n_anchors, sigma, n_iters, rng):
     conv_rate = converged / n_iters
 
     return {
-        "n_anchors": n_anchors,
-        "sigma_m": sigma,
-        "n_iters": n_iters,
-        "rmse_m": rmse,
-        "mae_m": mae,
-        "p90_m": p90,
-        "convergence_pct": conv_rate * 100.0,
+        'n_anchors': n_anchors,
+        'sigma_m': sigma,
+        'n_iters': n_iters,
+        'rmse_m': rmse,
+        'mae_m': mae,
+        'p90_m': p90,
+        'convergence_pct': conv_rate * 100.0,
     }
 
 
@@ -199,11 +199,11 @@ def save_csv(results, path):
     """Write results to a CSV file."""
     fields = ["n_anchors", "sigma_m", "n_iters", "rmse_m", "mae_m",
               "p90_m", "convergence_pct"]
-    with open(path, "w", newline="") as f:
+    with open(path, 'w', newline='') as f:
         writer = csv.DictWriter(f, fieldnames=fields)
         writer.writeheader()
         writer.writerows(results)
-    print(f"Results saved to: {path}")
+    print(f'Results saved to: {path}')
 
 
 # ---------------------------------------------------------------------------
@@ -217,13 +217,13 @@ NOISE_LEVELS = [0.0, 0.05, 0.10, 0.20]   # metres
 def parse_args():
     """Parse command-line arguments."""
     parser = argparse.ArgumentParser(
-        description="Offline UWB position accuracy benchmark (no ROS needed)")
-    parser.add_argument("--iters", type=int, default=1000,
-                        help="Gauss-Newton solves per configuration (default: 1000)")
-    parser.add_argument("--output", type=str, default=None,
-                        help="Output CSV path (default: ~/position_accuracy_<timestamp>.csv)")
-    parser.add_argument("--seed", type=int, default=42,
-                        help="Random seed for reproducibility (default: 42)")
+        description='Offline UWB position accuracy benchmark (no ROS needed)')
+    parser.add_argument('--iters', type=int, default=1000,
+                        help='Gauss-Newton solves per configuration (default: 1000)')
+    parser.add_argument('--output', type=str, default=None,
+                        help='Output CSV path (default: ~/position_accuracy_<timestamp>.csv)')
+    parser.add_argument('--seed', type=int, default=42,
+                        help='Random seed for reproducibility (default: 42)')
     return parser.parse_args()
 
 
@@ -232,9 +232,9 @@ def main():
     args = parse_args()
     rng = random.Random(args.seed)
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
     csv_path = args.output or os.path.expanduser(
-        f"~/position_accuracy_{timestamp}.csv")
+        f'~/position_accuracy_{timestamp}.csv')
 
     print("\nUWB Position Accuracy Benchmark")
     print(f"  Anchor counts  : {ANCHOR_COUNTS}")
@@ -267,5 +267,5 @@ def main():
               f"(RMSE={best['rmse_m']:.4f} m)")
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
