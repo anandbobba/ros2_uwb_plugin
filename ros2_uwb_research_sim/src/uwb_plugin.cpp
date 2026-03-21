@@ -116,7 +116,7 @@ void UWBPlugin::Configure(
     fixed_target_pos_ = Eigen::Vector3d(pos.X(), pos.Y(), pos.Z());
     has_fixed_target_pos_ = true;
     gzmsg << "UWB Plugin: Using fixed target position (" << pos.X()
-           << ", " << pos.Y() << ", " << pos.Z() << ")" << std::endl;
+          << ", " << pos.Y() << ", " << pos.Z() << ")" << std::endl;
   }
 
   // Declare ROS parameters for runtime reconfiguration
