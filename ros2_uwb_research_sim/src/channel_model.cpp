@@ -20,7 +20,7 @@ namespace ros2_uwb_research_sim
 {
 
 ChannelModel::ChannelModel(const ChannelParams & params)
-  : params_(params)
+: params_(params)
 {
   gaussian_noise_ = std::make_unique<GaussianNoiseModel>(params.gaussian_sigma);
   nlos_bias_ = std::make_unique<NLOSBiasModel>(params.nlos_lambda, params.nlos_prob);

@@ -15,12 +15,13 @@
 #ifndef ROS2_UWB_LOCALIZATION__TRILATERATION_SOLVER_HPP_
 #define ROS2_UWB_LOCALIZATION__TRILATERATION_SOLVER_HPP_
 
+#include <Eigen/Dense>
+
 #include <map>
 #include <memory>
 #include <string>
 #include <vector>
 
-#include <Eigen/Dense>
 #include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
 #include <rclcpp/rclcpp.hpp>
 

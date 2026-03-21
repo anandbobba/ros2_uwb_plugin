@@ -32,7 +32,7 @@ namespace ros2_uwb_research_sim
 {
 
 UWBPlugin::UWBPlugin()
-  : update_frequency_(10.0),
+: update_frequency_(10.0),
   last_update_time_(std::chrono::steady_clock::duration::zero())
 {
 }
@@ -149,11 +149,12 @@ void UWBPlugin::Configure(
   // Start background ROS thread
   ros_executor_ = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
   ros_executor_->add_node(ros_node_);
-  ros_thread_ = std::thread([this]() {
-    while (rclcpp::ok() && !stop_flag_) {
-      ros_executor_->spin();
-    }
-  });
+  ros_thread_ = std::thread(
+    [this]() {
+      while (rclcpp::ok() && !stop_flag_) {
+        ros_executor_->spin();
+      }
+    });
 
   gzmsg << "UWB Plugin configured for entity [" << entity << "]. "
         << "Target: [" << target_name_ << "]" << std::endl;

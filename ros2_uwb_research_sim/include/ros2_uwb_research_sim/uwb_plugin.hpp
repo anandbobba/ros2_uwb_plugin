@@ -59,8 +59,8 @@ using namespace ignition::gazebo;  // NOLINT
 namespace math
 {
 using namespace ignition::math;    // NOLINT
-}
-}
+  }
+}  // namespace gz
 #endif
 
 namespace ros2_uwb_research_sim

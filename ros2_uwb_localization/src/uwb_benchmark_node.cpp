@@ -98,13 +98,13 @@ public:
       std::cout << "  NLOS Rate : " << (static_cast<double>(nlos_events_) / diag_count_) * 100.0 <<
         "%\n";
       if (multipath_series_.size() > 1) {
-          double mean = total_multipath_ / multipath_series_.size();
-          double num = 0, den = 0;
-          for (size_t i = 0; i < multipath_series_.size() - 1; ++i) {
-            num += (multipath_series_[i] - mean) * (multipath_series_[i + 1] - mean);
-            den += (multipath_series_[i] - mean) * (multipath_series_[i] - mean);
-          }
-          std::cout << "  Multipath Correlation (lag-1): " << (den > 0 ? num / den : 0) << "\n";
+        double mean = total_multipath_ / multipath_series_.size();
+        double num = 0, den = 0;
+        for (size_t i = 0; i < multipath_series_.size() - 1; ++i) {
+          num += (multipath_series_[i] - mean) * (multipath_series_[i + 1] - mean);
+          den += (multipath_series_[i] - mean) * (multipath_series_[i] - mean);
+        }
+        std::cout << "  Multipath Correlation (lag-1): " << (den > 0 ? num / den : 0) << "\n";
       }
     }
     std::cout << "-----------------------------\n";
@@ -149,7 +149,9 @@ private:
     total_multipath_ += last_multipath_;
     total_drift_ += last_drift_;
 
-    if (msg->nlos_bias > 0.1) nlos_events_++;
+    if (msg->nlos_bias > 0.1) {
+      nlos_events_++;
+    }
     multipath_series_.push_back(msg->multipath_error);
     diag_count_++;
   }
@@ -162,7 +164,7 @@ private:
 
   nav_msgs::msg::Odometry::SharedPtr last_gt_;
   std::vector<double> errors_;
-  
+
   // Research stats
   double total_gaussian_ = 0, total_nlos_ = 0, total_multipath_ = 0, total_drift_ = 0;
   double last_gaussian_ = 0, last_nlos_ = 0, last_multipath_ = 0, last_drift_ = 0;

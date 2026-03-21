@@ -67,7 +67,7 @@ void AnchorManagerNode::load_anchors_from_params()
     };
 
     bool found = false;
-    for (const auto& prefix : prefixes) {
+    for (const auto & prefix : prefixes) {
       std::string id_param = prefix + ".id";
       std::string pos_param = prefix + ".position";
 
@@ -87,7 +87,9 @@ void AnchorManagerNode::load_anchors_from_params()
       }
     }
 
-    if (!found) continue;
+    if (!found) {
+      continue;
+    }
 
     AnchorConfig anchor;
     anchor.id = anchor_id;
