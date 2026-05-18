@@ -8,14 +8,12 @@
 A modular, research-grade UWB localization framework for ROS2 and Gazebo.
 
 ---
-
 ## 🎥 Demo
 
-[▶️ Watch Demo](https://drive.google.com/file/d/1kJ0pV0zVk8k41X8jCc-OAbcPqFgLc1oQ/view?usp=drive_link)
+[▶️ Watch Demo](https://drive.google.com/file/d/${GOOGLE_DRIVE_FILE_ID}/view?usp=drive_link)
 
 ---
-
-## 🛠 Features
+## 🔯 Features
 
 - **High-Fidelity Simulation**: Gazebo plugin with modular error models (Gaussian, NLOS Bias, Multipath, Clock Drift).
 - **Position Estimation**: Iterative Weighted Gauss-Newton Trilateration supporting 2D and 3D modes.
@@ -24,10 +22,9 @@ A modular, research-grade UWB localization framework for ROS2 and Gazebo.
 - **Hardware Agnostic**: Generic serial interface for real UWB sensors with built-in Mock Mode.
 
 ---
+## 💻 Architecture
 
-## 📐 Architecture
-
-```text
+```
        [ GAZEBO SIMULATION ]             [ LOCALIZATION PIPELINE ]
       +---------------------+           +--------------------------+
       |  UWB Plugin (Tag)   |           |  UWB Range Preprocessor  |
@@ -47,9 +44,9 @@ A modular, research-grade UWB localization framework for ROS2 and Gazebo.
       +---------------------+           +--------------------------+
 ```
 
----
 
-## 🚀 Quick Start
+---
+## 💀 Quick Start
 
 ### 1. Installation
 ```bash
@@ -80,8 +77,7 @@ ros2 launch ros2_uwb_research_sim demo.launch.py
 *Note: In Gazebo, click the "Play" button to start the simulation.*
 
 ---
-
-## 📊 Research Workflow
+## 💻 Research Workflow
 
 ### Dataset Recording
 Capture ranges, filtered poses, and diagnostic metrics for offline evaluation:
@@ -106,8 +102,7 @@ ros2 param set /uwb_plugin_uwb_anchor_0 nlos_prob 0.8
 ```
 
 ---
-
-## 🔌 Real Hardware Usage
+## 💻 Real Hardware Usage
 
 The framework includes a generic serial driver to bridge physical UWB tags (Decawave, LinkTrack, etc.) into the pipeline.
 
@@ -122,8 +117,7 @@ The framework includes a generic serial driver to bridge physical UWB tags (Deca
     ```
 
 ---
-
-## 📁 Repository Structure
+## 💻 Repository Structure
 
 - `ros2_uwb_msgs`: Custom interfaces for range aggregation and error diagnostics.
 - `ros2_uwb_localization`: Core positioning engine, preprocessor, and benchmark nodes.
@@ -131,8 +125,7 @@ The framework includes a generic serial driver to bridge physical UWB tags (Deca
 - `ros2_uwb_drivers`: Generic serial bridge for hardware integration.
 
 ---
-
-## 📡 Topics Output
+## 💻 Topics Output
 
 | Topic | Description |
 |---|---|
@@ -142,8 +135,7 @@ The framework includes a generic serial driver to bridge physical UWB tags (Deca
 | `/uwb/error_diagnostics` | Real-time breakdown of noise sources (Truth vs Measured). |
 
 ---
-
-## 🛠 Troubleshooting
+## 💻 Troubleshooting
 
 ### Topic Connectivity & Missing Transforms
 If you see "No transform" errors in RViz or empty topics, clear the Shared Memory locks and switch to CycloneDDS:
@@ -160,5 +152,4 @@ colcon build --symlink-install
 ```
 
 ---
-
 **License**: Apache 2.0
