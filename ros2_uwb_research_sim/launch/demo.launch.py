@@ -26,6 +26,7 @@ def generate_launch_description():
 
     # Arguments
     rviz = LaunchConfiguration('rviz', default='true')
+    dual_tag = LaunchConfiguration('dual_tag', default='false')
 
     # 1. Standard Simulation + Localization Launch
     # We leverage the existing modular launch files but override key params here
@@ -35,13 +36,16 @@ def generate_launch_description():
         ]),
         launch_arguments={
             'launch_rviz': rviz,
-            'use_sim_time': 'true'
+            'use_sim_time': 'true',
+            'dual_tag': dual_tag
         }.items()
     )
 
     # Note: We can add specific overrides for noise profiles here or in the world file
     # For this demo, we assume the world file has the desired UWB plugins.
 
+    from launch.actions import DeclareLaunchArgument
+    ld.add_action(DeclareLaunchArgument('dual_tag', default_value='false', description='Enable dual UWB tag yaw estimation'))
     ld.add_action(main_demo)
 
     return ld

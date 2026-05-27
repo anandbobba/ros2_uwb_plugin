@@ -75,7 +75,12 @@ Launch the simulator, localization pipeline, and automated research autopilot:
 ```bash
 # Recommended for stability (CycloneDDS)
 export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+
+# Launch in standard single-tag mode
 ros2 launch ros2_uwb_research_sim demo.launch.py
+
+# Or launch with the new Dual-Tag Yaw Estimation enabled
+ros2 launch ros2_uwb_research_sim demo.launch.py dual_tag:=true
 ```
 *Note: In Gazebo, click the "Play" button to start the simulation.*
 
@@ -185,7 +190,7 @@ ros2 launch ros2_uwb_localization localization.launch.py dual_tag:=true
 [IMU (/imu/data)] ---------------------------------------------------+
 ```
 
-### Advanced Yaw Features (NEXT STAGE)
+### Advanced Yaw Features
 1. **Dynamic Confidence & Covariance**: 
    The framework dynamically scales the yaw covariance based on the distortion of the measured baseline against the `baseline_expected`. If tags drop out, the node holds the last known yaw and gradually inflates the covariance.
 2. **IMU Complementary Fusion**:
