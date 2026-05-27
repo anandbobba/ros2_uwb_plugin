@@ -73,9 +73,11 @@ UWBVisualizationNode::UWBVisualizationNode()
   pose_sub_ = this->create_subscription<geometry_msgs::msg::PoseWithCovarianceStamped>(
     "/uwb/pose", 10, std::bind(&UWBVisualizationNode::pose_callback, this, std::placeholders::_1));
   front_pose_sub_ = this->create_subscription<geometry_msgs::msg::PoseWithCovarianceStamped>(
-    "/uwb/front/pose", 10, std::bind(&UWBVisualizationNode::front_pose_callback, this, std::placeholders::_1));
+    "/uwb/front/pose", 10,
+    std::bind(&UWBVisualizationNode::front_pose_callback, this, std::placeholders::_1));
   rear_pose_sub_ = this->create_subscription<geometry_msgs::msg::PoseWithCovarianceStamped>(
-    "/uwb/rear/pose", 10, std::bind(&UWBVisualizationNode::rear_pose_callback, this, std::placeholders::_1));
+    "/uwb/rear/pose", 10,
+    std::bind(&UWBVisualizationNode::rear_pose_callback, this, std::placeholders::_1));
 
   // Timer — sim-clock timer so marker stamps match Gazebo time
   double rate = this->get_parameter("publish_rate").as_double();
@@ -136,17 +138,20 @@ void UWBVisualizationNode::setup_range_subscriber(
     });
 }
 
-void UWBVisualizationNode::pose_callback(const geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg)
+void UWBVisualizationNode::pose_callback(
+  const geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg)
 {
   last_pose_ = msg;
 }
 
-void UWBVisualizationNode::front_pose_callback(const geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg)
+void UWBVisualizationNode::front_pose_callback(
+  const geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg)
 {
   last_front_pose_ = msg;
 }
 
-void UWBVisualizationNode::rear_pose_callback(const geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg)
+void UWBVisualizationNode::rear_pose_callback(
+  const geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg)
 {
   last_rear_pose_ = msg;
 }
@@ -174,20 +179,61 @@ void UWBVisualizationNode::timer_callback()
 
   // Dual Tag yaw and position markers
   if (last_pose_) {
-    visualization_msgs::msg::Marker m;
-    m.header = last_pose_->header;
-    m.ns = "uwb_yaw";
-    m.id = marker_id++;
-    m.type = visualization_msgs::msg::Marker::ARROW;
-    m.action = visualization_msgs::msg::Marker::ADD;
-    m.pose = last_pose_->pose.pose;
-    m.scale.x = 0.5; // shaft length
-    m.scale.y = 0.05; // shaft diameter
-    m.scale.z = 0.05; // head diameter
-    m.color.r = 1.0f; m.color.g = 0.5f; m.color.b = 0.0f; m.color.a = 1.0f;
-    m.lifetime = rclcpp::Duration::from_seconds(0.5);
-    marker_array.markers.push_back(m);
+    double yaw_cov = last_pose_->pose.covariance[35];
+    // Color coding: green (cov < 0.1), yellow (0.1 <= cov < 0.5), red (cov >= 0.5)
+    float r = 0.0f, g = 0.0f, b = 0.0f;
+    double scale = 1.0;
+    if (yaw_cov < 0.1) {r = 0.0f; g = 1.0f; scale = 1.0;} else if (yaw_cov < 0.5) {
+      r = 1.0f; g = 1.0f; scale = 0.7;
+    } else {r = 1.0f; g = 0.0f; scale = 0.4;}
+
+    visualization_msgs::msg::Marker m_arrow;
+    m_arrow.header = last_pose_->header;
+    m_arrow.ns = "uwb_yaw";
+    m_arrow.id = marker_id++;
+    m_arrow.type = visualization_msgs::msg::Marker::ARROW;
+    m_arrow.action = visualization_msgs::msg::Marker::ADD;
+    m_arrow.pose = last_pose_->pose.pose;
+    m_arrow.scale.x = 0.6 * scale;  // shaft length
+    m_arrow.scale.y = 0.08 * scale;  // shaft diameter
+    m_arrow.scale.z = 0.08 * scale;  // head diameter
+    m_arrow.color.r = r; m_arrow.color.g = g; m_arrow.color.b = b; m_arrow.color.a = 0.9f;
+    m_arrow.lifetime = rclcpp::Duration::from_seconds(0.5);
+    marker_array.markers.push_back(m_arrow);
+
+    // Covariance Ellipse
+    visualization_msgs::msg::Marker m_cov;
+    m_cov.header = last_pose_->header;
+    m_cov.ns = "uwb_covariance";
+    m_cov.id = marker_id++;
+    m_cov.type = visualization_msgs::msg::Marker::CYLINDER;
+    m_cov.action = visualization_msgs::msg::Marker::ADD;
+    m_cov.pose = last_pose_->pose.pose;
+    // Scale by 2 * std_dev
+    m_cov.scale.x = 2.0 * std::sqrt(std::max(0.001, last_pose_->pose.covariance[0]));
+    m_cov.scale.y = 2.0 * std::sqrt(std::max(0.001, last_pose_->pose.covariance[7]));
+    m_cov.scale.z = 0.01;  // flat disk
+    m_cov.color.r = 0.2f; m_cov.color.g = 0.6f; m_cov.color.b = 1.0f; m_cov.color.a = 0.3f;
+    m_cov.lifetime = rclcpp::Duration::from_seconds(0.5);
+    marker_array.markers.push_back(m_cov);
   }
+
+  if (last_front_pose_ && last_rear_pose_) {
+    // Baseline Line
+    visualization_msgs::msg::Marker m_line;
+    m_line.header = last_front_pose_->header;
+    m_line.ns = "uwb_baseline";
+    m_line.id = marker_id++;
+    m_line.type = visualization_msgs::msg::Marker::LINE_LIST;
+    m_line.action = visualization_msgs::msg::Marker::ADD;
+    m_line.scale.x = 0.02;  // line width
+    m_line.color.r = 0.8f; m_line.color.g = 0.8f; m_line.color.b = 0.8f; m_line.color.a = 1.0f;
+    m_line.points.push_back(last_front_pose_->pose.pose.position);
+    m_line.points.push_back(last_rear_pose_->pose.pose.position);
+    m_line.lifetime = rclcpp::Duration::from_seconds(0.5);
+    marker_array.markers.push_back(m_line);
+  }
+
   if (last_front_pose_) {
     visualization_msgs::msg::Marker m;
     m.header = last_front_pose_->header;
@@ -201,6 +247,7 @@ void UWBVisualizationNode::timer_callback()
     m.lifetime = rclcpp::Duration::from_seconds(0.5);
     marker_array.markers.push_back(m);
   }
+
   if (last_rear_pose_) {
     visualization_msgs::msg::Marker m;
     m.header = last_rear_pose_->header;

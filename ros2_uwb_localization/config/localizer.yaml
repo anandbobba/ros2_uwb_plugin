@@ -26,3 +26,5 @@
     baseline_expected: 0.7
     baseline_tolerance: 0.2
     smoothing_alpha: 0.8
+    use_imu_fusion: true
+    imu_alpha: 0.92

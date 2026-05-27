@@ -39,6 +39,10 @@ class UWBSerialDriver(Node):
         self.declare_parameter('std_dev', 0.05)
         self.declare_parameter('topic', '/uwb/range')
         self.declare_parameter('use_mock', False)
+        self.declare_parameter('front_tag_id', 'tag_front')
+        self.declare_parameter('rear_tag_id', 'tag_rear')
+        self.declare_parameter('front_tag_topic', '/uwb/front/range')
+        self.declare_parameter('rear_tag_topic', '/uwb/rear/range')
 
         self.port = self.get_parameter('serial_port').value
         self.baud = self.get_parameter('baudrate').value
@@ -46,9 +50,15 @@ class UWBSerialDriver(Node):
         self.std_dev = self.get_parameter('std_dev').value
         self.topic_name = self.get_parameter('topic').value
         self.use_mock = self.get_parameter('use_mock').value
+        self.front_tag_id = self.get_parameter('front_tag_id').value
+        self.rear_tag_id = self.get_parameter('rear_tag_id').value
+        self.front_topic = self.get_parameter('front_tag_topic').value
+        self.rear_topic = self.get_parameter('rear_tag_topic').value
 
-        # Publisher
-        self.publisher = self.create_publisher(UWBRange, self.topic_name, 10)
+        # Publishers
+        self.publisher_default = self.create_publisher(UWBRange, self.topic_name, 10)
+        self.publisher_front = self.create_publisher(UWBRange, self.front_topic, 10)
+        self.publisher_rear = self.create_publisher(UWBRange, self.rear_topic, 10)
 
         # Serial Connection
         self.ser = None
@@ -98,14 +108,22 @@ class UWBSerialDriver(Node):
         """
         Parse a single line of serial data.
 
-        Identifies expected formats like ANCHOR_ID,RANGE,RSSI.
+        Accepts both single tag format: ANCHOR_ID,RANGE,RSSI
+        and dual tag format: TAG_ID,ANCHOR_ID,RANGE,RSSI
         """
         parts = line.split(',')
         if len(parts) >= 2:
             try:
-                anchor_id = parts[0].strip()
-                range_val = float(parts[1].strip())
-                rssi = float(parts[2].strip()) if len(parts) > 2 else 0.0
+                if len(parts) >= 4:
+                    tag_id = parts[0].strip()
+                    anchor_id = parts[1].strip()
+                    range_val = float(parts[2].strip())
+                    rssi = float(parts[3].strip())
+                else:
+                    tag_id = None
+                    anchor_id = parts[0].strip()
+                    range_val = float(parts[1].strip())
+                    rssi = float(parts[2].strip()) if len(parts) > 2 else 0.0
 
                 # Basic validation
                 if range_val < 0 or range_val > 100.0:
@@ -119,7 +137,12 @@ class UWBSerialDriver(Node):
                 msg.rssi = rssi
                 msg.std_dev = self.std_dev
 
-                self.publisher.publish(msg)
+                if tag_id == self.front_tag_id:
+                    self.publisher_front.publish(msg)
+                elif tag_id == self.rear_tag_id:
+                    self.publisher_rear.publish(msg)
+                else:
+                    self.publisher_default.publish(msg)
 
             except ValueError:
                 self.get_logger().debug(f'Malformed serial data: {line}')

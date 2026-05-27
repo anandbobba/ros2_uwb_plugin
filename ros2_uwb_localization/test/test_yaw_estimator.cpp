@@ -28,7 +28,7 @@ TEST(YawEstimatorTest, ComputeYaw)
   double distance = std::sqrt(dx * dx + dy * dy);
 
   EXPECT_DOUBLE_EQ(distance, 1.0);
-  
+
   double raw_yaw = std::atan2(dy, dx);
   EXPECT_DOUBLE_EQ(raw_yaw, 0.0);
 
@@ -52,14 +52,80 @@ TEST(YawEstimatorTest, EMASmoothing)
   double current_cos = std::cos(current_yaw);
   double raw_sin = std::sin(raw_yaw);
   double raw_cos = std::cos(raw_yaw);
-  
+
   double new_sin = smoothing_alpha * raw_sin + (1.0 - smoothing_alpha) * current_sin;
   double new_cos = smoothing_alpha * raw_cos + (1.0 - smoothing_alpha) * current_cos;
-  
+
   double smoothed_yaw = std::atan2(new_sin, new_cos);
-  
+
   // atan2(0.8, 0.2) = 1.3258 rad
   EXPECT_NEAR(smoothed_yaw, 1.32581766, 1e-6);
+}
+
+// Wrap-around logic test
+TEST(YawEstimatorTest, AngularWrapAround)
+{
+  auto normalize_angle = [](double angle) {
+      while (angle > M_PI) {angle -= 2.0 * M_PI;}
+      while (angle < -M_PI) {angle += 2.0 * M_PI;}
+      return angle;
+    };
+
+  auto shortest_angular_distance = [&normalize_angle](double from, double to) {
+      return normalize_angle(to - from);
+    };
+
+  EXPECT_NEAR(shortest_angular_distance(M_PI - 0.1, -M_PI + 0.1), 0.2, 1e-6);
+  EXPECT_NEAR(shortest_angular_distance(-M_PI + 0.1, M_PI - 0.1), -0.2, 1e-6);
+}
+
+// Covariance inflation test
+TEST(YawEstimatorTest, CovarianceConfidence)
+{
+  double baseline_expected = 0.7;
+  double measured_baseline = 0.8;
+
+  double confidence =
+    std::max(
+    0.0,
+    std::min(1.0, 1.0 - std::abs(measured_baseline - baseline_expected) / baseline_expected));
+  EXPECT_NEAR(confidence, 1.0 - (0.1 / 0.7), 1e-6);
+
+  double uwb_cov = 0.01 + (1.0 - confidence) * 100.0;
+  EXPECT_NEAR(uwb_cov, 0.01 + (0.1 / 0.7) * 100.0, 1e-6);
+
+  // Perfect baseline
+  measured_baseline = 0.7;
+  confidence =
+    std::max(
+    0.0, std::min(
+      1.0, 1.0 - std::abs(
+        measured_baseline - baseline_expected) / baseline_expected));
+  EXPECT_DOUBLE_EQ(confidence, 1.0);
+  EXPECT_DOUBLE_EQ(0.01 + (1.0 - confidence) * 100.0, 0.01);
+}
+
+// IMU Fusion math test
+TEST(YawEstimatorTest, IMUFusionMath)
+{
+  double imu_alpha = 0.92;
+  double uwb_yaw = 0.5;
+  double imu_yaw = 0.6;
+
+  auto normalize_angle = [](double angle) {
+      while (angle > M_PI) {angle -= 2.0 * M_PI;}
+      while (angle < -M_PI) {angle += 2.0 * M_PI;}
+      return angle;
+    };
+
+  double current_yaw = normalize_angle(uwb_yaw + imu_alpha * normalize_angle(imu_yaw - uwb_yaw));
+  EXPECT_NEAR(current_yaw, 0.5 + 0.92 * 0.1, 1e-6);
+
+  // With wrap
+  uwb_yaw = M_PI - 0.1;
+  imu_yaw = -M_PI + 0.1;
+  current_yaw = normalize_angle(uwb_yaw + imu_alpha * normalize_angle(imu_yaw - uwb_yaw));
+  EXPECT_NEAR(current_yaw, normalize_angle(M_PI - 0.1 + 0.184), 1e-6);
 }
 
 int main(int argc, char ** argv)

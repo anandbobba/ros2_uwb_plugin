@@ -24,6 +24,9 @@
 #include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <nav_msgs/msg/odometry.hpp>
+#include "tf2/LinearMath/Quaternion.h"
+#include "tf2/LinearMath/Matrix3x3.h"
+#include "tf2_geometry_msgs/tf2_geometry_msgs.hpp"
 #include "ros2_uwb_msgs/msg/uwb_error_diagnostics.hpp"
 
 namespace ros2_uwb_localization
@@ -58,7 +61,9 @@ public:
       diag_topic_, 10, std::bind(&BenchmarkNode::diag_callback, this, std::placeholders::_1));
 
     log_file_.open(log_file_path_);
-    log_file_ << "timestamp,error_x,error_y,error_z,error_3d,gaussian,nlos,multipath,drift\n";
+    log_file_ <<
+      "timestamp,error_x,error_y,error_z,error_3d,gaussian,nlos,multipath,drift,error_yaw,"
+      "covariance_yaw\n";
 
     RCLCPP_INFO(
       this->get_logger(), "Benchmarking node started. Logging to %s",
@@ -82,11 +87,21 @@ public:
     std::sort(sorted_errors.begin(), sorted_errors.end());
     double p95 = sorted_errors[static_cast<size_t>(sorted_errors.size() * 0.95)];
 
+    double yaw_rmse = std::sqrt(
+      std::accumulate(
+        yaw_errors_.begin(), yaw_errors_.end(), 0.0,
+        [](double a, double b) {return a + b * b;}) / yaw_errors_.size());
+    double yaw_mae = std::accumulate(
+      yaw_errors_.begin(), yaw_errors_.end(), 0.0,
+      [](double a, double b) {return a + std::abs(b);}) / yaw_errors_.size();
+
     std::cout << "\n--- UWB Benchmark Results ---\n";
     std::cout << "  Samples : " << errors_.size() << "\n";
-    std::cout << "  RMSE    : " << rmse << " m\n";
-    std::cout << "  MAE     : " << mae << " m\n";
-    std::cout << "  P95     : " << p95 << " m\n";
+    std::cout << "  Pos RMSE: " << rmse << " m\n";
+    std::cout << "  Pos MAE : " << mae << " m\n";
+    std::cout << "  Pos P95 : " << p95 << " m\n";
+    std::cout << "  Yaw RMSE: " << yaw_rmse * 180.0 / M_PI << " deg\n";
+    std::cout << "  Yaw MAE : " << yaw_mae * 180.0 / M_PI << " deg\n";
 
     if (diag_count_ > 0) {
       double total_abs_err = total_gaussian_ + total_nlos_ + total_multipath_ + total_drift_;
@@ -129,12 +144,26 @@ private:
     double dz = msg->pose.pose.position.z - last_gt_->pose.pose.position.z;
     double d3d = std::sqrt(dx * dx + dy * dy + dz * dz);
 
+    tf2::Quaternion q_gt, q_est;
+    tf2::fromMsg(last_gt_->pose.pose.orientation, q_gt);
+    tf2::fromMsg(msg->pose.pose.orientation, q_est);
+    tf2::Matrix3x3 m_gt(q_gt), m_est(q_est);
+    double r1, p1, y_gt, r2, p2, y_est;
+    m_gt.getRPY(r1, p1, y_gt);
+    m_est.getRPY(r2, p2, y_est);
+
+    double d_yaw = y_est - y_gt;
+    while (d_yaw > M_PI) {d_yaw -= 2.0 * M_PI;}
+    while (d_yaw < -M_PI) {d_yaw += 2.0 * M_PI;}
+
     errors_.push_back(d3d);
+    yaw_errors_.push_back(d_yaw);
     // We log the latest diagnostic values if they correspond to the same time (approx)
     log_file_ << msg->header.stamp.sec << "." << msg->header.stamp.nanosec << ","
               << dx << "," << dy << "," << dz << "," << d3d << ","
               << last_gaussian_ << "," << last_nlos_ << "," << last_multipath_ << "," <<
-      last_drift_ << "\n";
+      last_drift_ << ","
+              << d_yaw << "," << msg->pose.covariance[35] << "\n";
   }
 
   void diag_callback(const ros2_uwb_msgs::msg::UWBErrorDiagnostics::SharedPtr msg)
@@ -164,6 +193,7 @@ private:
 
   nav_msgs::msg::Odometry::SharedPtr last_gt_;
   std::vector<double> errors_;
+  std::vector<double> yaw_errors_;
 
   // Research stats
   double total_gaussian_ = 0, total_nlos_ = 0, total_multipath_ = 0, total_drift_ = 0;

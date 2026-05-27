@@ -53,7 +53,7 @@ private:
   void load_anchors_from_params();
   void setup_range_subscriber(const std::string & anchor_id, int index);
   void timer_callback();
-  
+
   void pose_callback(const geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg);
   void front_pose_callback(const geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg);
   void rear_pose_callback(const geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg);

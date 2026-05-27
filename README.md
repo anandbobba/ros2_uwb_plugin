@@ -179,9 +179,23 @@ ros2 launch ros2_uwb_localization localization.launch.py dual_tag:=true
 
 ```text
 [Front Ranges] -> Preprocessor -> Solver -> /uwb/front/pose \
-                                                             -> Yaw Estimator -> /uwb/pose (x,y,yaw) -> EKF
-[Rear Ranges]  -> Preprocessor -> Solver -> /uwb/rear/pose  /
+                                                             -> Yaw Estimator -> /uwb/pose (x,y,yaw,cov) -> EKF
+[Rear Ranges]  -> Preprocessor -> Solver -> /uwb/rear/pose  /        ^
+                                                                     |
+[IMU (/imu/data)] ---------------------------------------------------+
 ```
+
+### Advanced Yaw Features (NEXT STAGE)
+1. **Dynamic Confidence & Covariance**: 
+   The framework dynamically scales the yaw covariance based on the distortion of the measured baseline against the `baseline_expected`. If tags drop out, the node holds the last known yaw and gradually inflates the covariance.
+2. **IMU Complementary Fusion**:
+   If `use_imu_fusion` is enabled, the estimator uses a complementary filter to pull high-frequency IMU yaw toward the drift-free UWB yaw absolute reference, preventing angular drift.
+3. **Advanced RViz Visualization**:
+   - Color-coded confidence arrows (Green=Stable, Yellow=Uncertain, Red=Poor)
+   - Dynamic covariance ellipses
+   - Real-time front-to-rear baseline rendering
+4. **Hardware Driver Extension**:
+   To pass dual hardware tags on a single serial port, the driver supports a 4-element CSV output: `TAG_ID,ANCHOR_ID,RANGE,RSSI`. Configure `front_tag_id` and `rear_tag_id` in `uwb_driver.yaml`.
 
 ---
 

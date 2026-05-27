@@ -11,6 +11,12 @@
     # ROS2 Settings
     frame_id: "uwb_tag"
     topic: "/uwb/range"
+    
+    # Dual-Tag Settings
+    front_tag_id: "tag_front"
+    rear_tag_id: "tag_rear"
+    front_tag_topic: "/uwb/front/range"
+    rear_tag_topic: "/uwb/rear/range"
 
     # Calibration / Error Model
     # Expected standard deviation for the trilateration solver

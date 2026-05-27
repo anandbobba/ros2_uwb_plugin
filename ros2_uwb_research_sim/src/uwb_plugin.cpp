@@ -18,6 +18,7 @@
 #include <gz/sim/components/Pose.hh>
 #include <gz/sim/components/Name.hh>
 #include <gz/sim/components/Model.hh>
+#include <gz/sim/components/ParentEntity.hh>
 #include <gz/sim/EntityComponentManager.hh>
 #include <gz/sim/Util.hh>
 #include <rcl_interfaces/msg/set_parameters_result.hpp>
@@ -181,7 +182,9 @@ void UWBPlugin::PostUpdate(
     if (link_entity != gz::sim::kNullEntity) {
       pose_entity = link_entity;
     } else {
-      RCLCPP_WARN_ONCE(ros_node_->get_logger(), "Host link '%s' not found, using model pose.", host_link_name_.c_str());
+      RCLCPP_WARN_ONCE(
+        ros_node_->get_logger(), "Host link '%s' not found, using model pose.",
+        host_link_name_.c_str());
     }
   }
 
