@@ -14,7 +14,7 @@
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, LogInfo
-from launch.conditions import IfCondition
+
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
@@ -79,7 +79,7 @@ def generate_launch_description():
     )
 
     # Note: RViz is now handled inside localization.launch.py, so we don't need to launch it here
-    # However, if run_rviz is true, it will be launched by localization.launch.py (which we should probably support there)
+    # However, if run_rviz is true, it will be launched by localization.launch.py
     # Actually, localization.launch.py always launches RViz right now.
 
     # 7. Research Autopilot (Circular Motion)

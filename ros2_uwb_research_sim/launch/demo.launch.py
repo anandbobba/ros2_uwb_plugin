@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.substitutions import FindPackageShare
@@ -44,8 +44,11 @@ def generate_launch_description():
     # Note: We can add specific overrides for noise profiles here or in the world file
     # For this demo, we assume the world file has the desired UWB plugins.
 
-    from launch.actions import DeclareLaunchArgument
-    ld.add_action(DeclareLaunchArgument('dual_tag', default_value='false', description='Enable dual UWB tag yaw estimation'))
+    ld.add_action(DeclareLaunchArgument(
+        'dual_tag',
+        default_value='false',
+        description='Enable dual UWB tag yaw estimation'
+    ))
     ld.add_action(main_demo)
 
     return ld
