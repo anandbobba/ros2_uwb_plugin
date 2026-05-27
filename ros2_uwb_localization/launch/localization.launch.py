@@ -18,6 +18,9 @@ from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 
+from launch.conditions import IfCondition, UnlessCondition
+from launch.actions import DeclareLaunchArgument
+
 def generate_launch_description():
     ld = LaunchDescription()
 
@@ -25,6 +28,10 @@ def generate_launch_description():
 
     # Arguments
     use_sim_time = LaunchConfiguration('use_sim_time', default='false')
+    dual_tag = LaunchConfiguration('dual_tag', default='false')
+
+    ld.add_action(DeclareLaunchArgument('use_sim_time', default_value='false', description='Use simulation (Gazebo) clock if true'))
+    ld.add_action(DeclareLaunchArgument('dual_tag', default_value='false', description='Enable dual UWB tag yaw estimation'))
 
     # Config file paths
     localizer_config = PathJoinSubstitution([pkg_localization, 'config', 'localizer.yaml'])
@@ -39,22 +46,81 @@ def generate_launch_description():
         parameters=[anchors_config, {'use_sim_time': use_sim_time}]
     )
 
-    # 2. Modular Localization Pipeline
-    preprocessor = Node(
+    # 2. Single Tag Pipeline
+    preprocessor_single = Node(
         package='ros2_uwb_localization',
         executable='uwb_range_preprocessor',
         name='uwb_range_preprocessor',
-        parameters=[localizer_config, {'use_sim_time': use_sim_time}]
+        parameters=[localizer_config, {'use_sim_time': use_sim_time}],
+        condition=UnlessCondition(dual_tag)
     )
 
-    solver = Node(
+    solver_single = Node(
         package='ros2_uwb_localization',
         executable='uwb_trilateration_solver',
         name='uwb_trilateration_solver',
-        parameters=[localizer_config, anchors_config, {'use_sim_time': use_sim_time}]
+        parameters=[localizer_config, anchors_config, {'use_sim_time': use_sim_time}],
+        condition=UnlessCondition(dual_tag)
     )
 
-    # 3. EKF Fusion (robot_localization)
+    # 3. Dual Tag Pipeline
+    preprocessor_front = Node(
+        package='ros2_uwb_localization',
+        executable='uwb_range_preprocessor',
+        name='uwb_range_preprocessor_front',
+        parameters=[localizer_config, {'use_sim_time': use_sim_time}],
+        remappings=[
+            ('/uwb/range', '/uwb/front/range'),
+            ('/uwb/ranges_filtered', '/uwb/front/ranges_filtered')
+        ],
+        condition=IfCondition(dual_tag)
+    )
+
+    solver_front = Node(
+        package='ros2_uwb_localization',
+        executable='uwb_trilateration_solver',
+        name='uwb_trilateration_solver_front',
+        parameters=[localizer_config, anchors_config, {'use_sim_time': use_sim_time}],
+        remappings=[
+            ('/uwb/ranges_filtered', '/uwb/front/ranges_filtered'),
+            ('/uwb/pose', '/uwb/front/pose')
+        ],
+        condition=IfCondition(dual_tag)
+    )
+
+    preprocessor_rear = Node(
+        package='ros2_uwb_localization',
+        executable='uwb_range_preprocessor',
+        name='uwb_range_preprocessor_rear',
+        parameters=[localizer_config, {'use_sim_time': use_sim_time}],
+        remappings=[
+            ('/uwb/range', '/uwb/rear/range'),
+            ('/uwb/ranges_filtered', '/uwb/rear/ranges_filtered')
+        ],
+        condition=IfCondition(dual_tag)
+    )
+
+    solver_rear = Node(
+        package='ros2_uwb_localization',
+        executable='uwb_trilateration_solver',
+        name='uwb_trilateration_solver_rear',
+        parameters=[localizer_config, anchors_config, {'use_sim_time': use_sim_time}],
+        remappings=[
+            ('/uwb/ranges_filtered', '/uwb/rear/ranges_filtered'),
+            ('/uwb/pose', '/uwb/rear/pose')
+        ],
+        condition=IfCondition(dual_tag)
+    )
+
+    yaw_estimator = Node(
+        package='ros2_uwb_localization',
+        executable='uwb_yaw_estimator',
+        name='uwb_yaw_estimator',
+        parameters=[localizer_config, {'use_sim_time': use_sim_time}],
+        condition=IfCondition(dual_tag)
+    )
+
+    # 4. EKF Fusion (robot_localization)
     ekf = Node(
         package='robot_localization',
         executable='ekf_node',
@@ -64,7 +130,7 @@ def generate_launch_description():
         remappings=[('/odometry/filtered', '/odometry/filtered_uwb')]
     )
 
-    # 4. Visualization
+    # 5. Visualization
     visualization = Node(
         package='ros2_uwb_localization',
         executable='uwb_visualization_node',
@@ -77,8 +143,13 @@ def generate_launch_description():
     )
 
     ld.add_action(anchor_manager)
-    ld.add_action(preprocessor)
-    ld.add_action(solver)
+    ld.add_action(preprocessor_single)
+    ld.add_action(solver_single)
+    ld.add_action(preprocessor_front)
+    ld.add_action(solver_front)
+    ld.add_action(preprocessor_rear)
+    ld.add_action(solver_rear)
+    ld.add_action(yaw_estimator)
     ld.add_action(ekf)
     ld.add_action(visualization)
 

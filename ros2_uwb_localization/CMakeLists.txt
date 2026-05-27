@@ -23,6 +23,7 @@ find_package(tf2_geometry_msgs REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(yaml-cpp REQUIRED)
 find_package(ros2_uwb_msgs REQUIRED)
+find_package(message_filters REQUIRED)
 
 set(COMMON_DEPS
   rclcpp
@@ -33,6 +34,7 @@ set(COMMON_DEPS
   tf2_ros
   tf2_geometry_msgs
   ros2_uwb_msgs
+  message_filters
 )
 
 include_directories(
@@ -85,6 +87,14 @@ add_executable(uwb_range_preprocessor
 ament_target_dependencies(uwb_range_preprocessor ${COMMON_DEPS})
 
 # ========================================================================
+# UWB Yaw Estimator
+# ========================================================================
+add_executable(uwb_yaw_estimator
+  src/uwb_yaw_estimator.cpp
+)
+ament_target_dependencies(uwb_yaw_estimator ${COMMON_DEPS})
+
+# ========================================================================
 # Install
 # ========================================================================
 install(TARGETS
@@ -93,6 +103,7 @@ install(TARGETS
   uwb_range_preprocessor
   uwb_benchmark_node
   uwb_visualization_node
+  uwb_yaw_estimator
   DESTINATION lib/${PROJECT_NAME}
 )
 
@@ -134,7 +145,10 @@ if(BUILD_TESTING)
   # Covariance propagation and outlier rejection math tests
   ament_add_gtest(test_covariance test/test_covariance.cpp)
   target_include_directories(test_covariance PRIVATE ${EIGEN3_INCLUDE_DIRS})
-  ament_target_dependencies(test_covariance Eigen3)
+  # Yaw estimator logic tests
+  ament_add_gtest(test_yaw_estimator test/test_yaw_estimator.cpp)
+  target_include_directories(test_yaw_estimator PRIVATE ${EIGEN3_INCLUDE_DIRS})
+  ament_target_dependencies(test_yaw_estimator Eigen3 geometry_msgs)
 endif()
 
 ament_package()

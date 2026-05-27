@@ -53,4 +53,33 @@
     <child link="right_wheel"/>
     <origin xyz="0 -0.3 -0.1" rpy="-1.5707 0 0"/>
   </joint>
+
+  <!-- UWB Tags -->
+  <link name="front_tag">
+    <visual>
+      <geometry><sphere radius="0.05"/></geometry>
+      <material name="green"><color rgba="0 1 0 1"/></material>
+    </visual>
+  </link>
+
+  <link name="rear_tag">
+    <visual>
+      <geometry><sphere radius="0.05"/></geometry>
+      <material name="red"><color rgba="1 0 0 1"/></material>
+    </visual>
+  </link>
+
+  <joint name="front_tag_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="front_tag"/>
+    <!-- Baseline of 0.7m total, +/- 0.35m -->
+    <origin xyz="0.35 0 0.1" rpy="0 0 0"/>
+  </joint>
+
+  <joint name="rear_tag_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="rear_tag"/>
+    <origin xyz="-0.35 0 0.1" rpy="0 0 0"/>
+  </joint>
+
 </robot>

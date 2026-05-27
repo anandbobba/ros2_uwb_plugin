@@ -143,6 +143,48 @@ The framework includes a generic serial driver to bridge physical UWB tags (Deca
 
 ---
 
+## Dual Tag Yaw Estimation
+
+The `ros2_uwb_plugin` now supports estimating the robot's yaw (heading) using two UWB tags mounted on the front and rear of the robot. This is crucial for environments where IMU or odometry-based heading is unreliable.
+
+### Why Yaw Matters
+Trilateration with a single UWB tag provides `(x, y, z)` position but no orientation. Without orientation, EKF fusion heavily relies on the IMU or odometry to maintain heading, which can drift over time. Dual UWB tags provide a drift-free absolute heading measurement.
+
+### Mathematical Derivation
+The yaw is computed simply using the `atan2` function on the relative positions of the front and rear tags:
+```cpp
+double dx = front.x - rear.x;
+double dy = front.y - rear.y;
+double yaw = atan2(dy, dx);
+```
+An Exponential Moving Average (EMA) filter is applied to the sine and cosine components of the raw yaw to smooth the output while avoiding wrap-around issues.
+
+### Integration Guide
+1. **Physical Setup**: Mount two UWB tags on the robot, aligned with the longitudinal axis (front-to-back).
+2. **Configuration**: Measure the distance between the tags and update the `baseline_expected` parameter in `config/localizer.yaml`.
+3. **Launch**: Use the `dual_tag:=true` argument to launch the dual-tag pipeline.
+
+### Example Launch Commands
+**Single Tag Mode (Default)**
+```bash
+ros2 launch ros2_uwb_localization localization.launch.py
+```
+
+**Dual Tag Mode**
+```bash
+ros2 launch ros2_uwb_localization localization.launch.py dual_tag:=true
+```
+
+## Architecture Diagram (Dual Tag)
+
+```text
+[Front Ranges] -> Preprocessor -> Solver -> /uwb/front/pose \
+                                                             -> Yaw Estimator -> /uwb/pose (x,y,yaw) -> EKF
+[Rear Ranges]  -> Preprocessor -> Solver -> /uwb/rear/pose  /
+```
+
+---
+
 ## 🛠 Troubleshooting
 
 ### Topic Connectivity & Missing Transforms

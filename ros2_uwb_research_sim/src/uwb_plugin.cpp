@@ -64,6 +64,7 @@ void UWBPlugin::Configure(
   // Read SDF parameters
   target_name_ = sdf->Get<std::string>("target_entity", "anchor").first;
   update_frequency_ = sdf->Get<double>("update_rate", 10.0).first;
+  host_link_name_ = sdf->HasElement("host_link") ? sdf->Get<std::string>("host_link") : "";
 
   // Predictable node name for each anchor link
   std::string node_name = "uwb_plugin_" + target_name_;
@@ -172,7 +173,19 @@ void UWBPlugin::PostUpdate(
   last_update_time_ = info.simTime;
 
   // Get host position
-  auto p_host_ign = gz::sim::worldPose(host_entity_, ecm).Pos();
+  gz::sim::Entity pose_entity = host_entity_;
+  if (!host_link_name_.empty()) {
+    gz::sim::Entity link_entity = ecm.EntityByComponents(
+      gz::sim::components::Name(host_link_name_),
+      gz::sim::components::ParentEntity(host_entity_));
+    if (link_entity != gz::sim::kNullEntity) {
+      pose_entity = link_entity;
+    } else {
+      RCLCPP_WARN_ONCE(ros_node_->get_logger(), "Host link '%s' not found, using model pose.", host_link_name_.c_str());
+    }
+  }
+
+  auto p_host_ign = gz::sim::worldPose(pose_entity, ecm).Pos();
   Eigen::Vector3d p_host(p_host_ign.X(), p_host_ign.Y(), p_host_ign.Z());
 
   // Get target position: use fixed position if available, else entity lookup

@@ -99,6 +99,7 @@ private:
   gz::sim::Entity host_entity_;
   gz::sim::Entity target_entity_;
   std::string target_name_;
+  std::string host_link_name_;
   std::string frame_id_;
 
   // Optional fixed target position from SDF (avoids entity lookup issues)

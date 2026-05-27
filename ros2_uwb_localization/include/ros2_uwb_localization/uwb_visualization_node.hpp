@@ -25,6 +25,7 @@
 #include <sensor_msgs/msg/range.hpp>
 #include <visualization_msgs/msg/marker.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
+#include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
 
 namespace ros2_uwb_localization
 {
@@ -52,6 +53,10 @@ private:
   void load_anchors_from_params();
   void setup_range_subscriber(const std::string & anchor_id, int index);
   void timer_callback();
+  
+  void pose_callback(const geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg);
+  void front_pose_callback(const geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg);
+  void rear_pose_callback(const geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg);
 
   visualization_msgs::msg::Marker make_anchor_marker(
     const AnchorVizData & anchor, int marker_id) const;
@@ -75,6 +80,14 @@ private:
   std::map<std::string, rclcpp::Subscription<sensor_msgs::msg::Range>::SharedPtr> range_subs_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
   rclcpp::TimerBase::SharedPtr timer_;
+
+  rclcpp::Subscription<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr pose_sub_;
+  rclcpp::Subscription<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr front_pose_sub_;
+  rclcpp::Subscription<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr rear_pose_sub_;
+
+  geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr last_pose_;
+  geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr last_front_pose_;
+  geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr last_rear_pose_;
 };
 
 }  // namespace ros2_uwb_localization

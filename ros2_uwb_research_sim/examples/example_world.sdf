@@ -282,10 +282,9 @@
         <update_frequency>50</update_frequency>
       </plugin>
 
-      <!-- UWB Tag measuring against Anchor 0 -->
-      <plugin
-        filename="libUWBPlugin.so"
-        name="ros2_uwb_research_sim::UWBPlugin">
+      <!-- FRONT TAG PLUGINS -->
+      <plugin filename="libUWBPlugin.so" name="ros2_uwb_research_sim::UWBPlugin">
+        <host_link>front_tag</host_link>
         <target_entity>uwb_anchor_0</target_entity>
         <target_position>5 5 2</target_position>
         <update_rate>20.0</update_rate>
@@ -295,60 +294,94 @@
         <multipath_alpha>0.8</multipath_alpha>
         <multipath_std>0.01</multipath_std>
         <clock_drift_std>0.0001</clock_drift_std>
-        <topic>/uwb/range_0</topic>
-        <research_topic>/uwb/research_data</research_topic>
+        <topic>/uwb/front/range_0</topic>
+        <research_topic>/uwb/front/research_data</research_topic>
         <frame_id>uwb_anchor_0</frame_id>
       </plugin>
-
-      <!-- UWB Tag measuring against Anchor 1 -->
-      <plugin
-        filename="libUWBPlugin.so"
-        name="ros2_uwb_research_sim::UWBPlugin">
+      <plugin filename="libUWBPlugin.so" name="ros2_uwb_research_sim::UWBPlugin">
+        <host_link>front_tag</host_link>
         <target_entity>uwb_anchor_1</target_entity>
         <target_position>-5 5 2</target_position>
         <update_rate>20.0</update_rate>
         <gaussian_std>0.02</gaussian_std>
         <nlos_lambda>1.5</nlos_lambda>
         <nlos_prob>0.1</nlos_prob>
-        <multipath_alpha>0.8</multipath_alpha>
-        <multipath_std>0.01</multipath_std>
-        <clock_drift_std>0.0001</clock_drift_std>
-        <topic>/uwb/range_1</topic>
-        <research_topic>/uwb/research_data</research_topic>
+        <topic>/uwb/front/range_1</topic>
+        <research_topic>/uwb/front/research_data</research_topic>
         <frame_id>uwb_anchor_1</frame_id>
       </plugin>
-
-      <plugin
-        filename="libUWBPlugin.so"
-        name="ros2_uwb_research_sim::UWBPlugin">
+      <plugin filename="libUWBPlugin.so" name="ros2_uwb_research_sim::UWBPlugin">
+        <host_link>front_tag</host_link>
         <target_entity>uwb_anchor_2</target_entity>
         <target_position>5 -5 2</target_position>
         <update_rate>20.0</update_rate>
         <gaussian_std>0.02</gaussian_std>
         <nlos_lambda>1.5</nlos_lambda>
         <nlos_prob>0.1</nlos_prob>
-        <multipath_alpha>0.8</multipath_alpha>
-        <multipath_std>0.01</multipath_std>
-        <clock_drift_std>0.0001</clock_drift_std>
-        <topic>/uwb/range_2</topic>
-        <research_topic>/uwb/research_data</research_topic>
+        <topic>/uwb/front/range_2</topic>
+        <research_topic>/uwb/front/research_data</research_topic>
         <frame_id>uwb_anchor_2</frame_id>
       </plugin>
-
-      <plugin
-        filename="libUWBPlugin.so"
-        name="ros2_uwb_research_sim::UWBPlugin">
+      <plugin filename="libUWBPlugin.so" name="ros2_uwb_research_sim::UWBPlugin">
+        <host_link>front_tag</host_link>
         <target_entity>uwb_anchor_3</target_entity>
         <target_position>-5 -5 2</target_position>
         <update_rate>20.0</update_rate>
         <gaussian_std>0.02</gaussian_std>
         <nlos_lambda>1.5</nlos_lambda>
         <nlos_prob>0.1</nlos_prob>
-        <multipath_alpha>0.8</multipath_alpha>
-        <multipath_std>0.01</multipath_std>
-        <clock_drift_std>0.0001</clock_drift_std>
-        <topic>/uwb/range_3</topic>
-        <research_topic>/uwb/research_data</research_topic>
+        <topic>/uwb/front/range_3</topic>
+        <research_topic>/uwb/front/research_data</research_topic>
+        <frame_id>uwb_anchor_3</frame_id>
+      </plugin>
+
+      <!-- REAR TAG PLUGINS -->
+      <plugin filename="libUWBPlugin.so" name="ros2_uwb_research_sim::UWBPlugin">
+        <host_link>rear_tag</host_link>
+        <target_entity>uwb_anchor_0</target_entity>
+        <target_position>5 5 2</target_position>
+        <update_rate>20.0</update_rate>
+        <gaussian_std>0.02</gaussian_std>
+        <nlos_lambda>1.5</nlos_lambda>
+        <nlos_prob>0.1</nlos_prob>
+        <topic>/uwb/rear/range_0</topic>
+        <research_topic>/uwb/rear/research_data</research_topic>
+        <frame_id>uwb_anchor_0</frame_id>
+      </plugin>
+      <plugin filename="libUWBPlugin.so" name="ros2_uwb_research_sim::UWBPlugin">
+        <host_link>rear_tag</host_link>
+        <target_entity>uwb_anchor_1</target_entity>
+        <target_position>-5 5 2</target_position>
+        <update_rate>20.0</update_rate>
+        <gaussian_std>0.02</gaussian_std>
+        <nlos_lambda>1.5</nlos_lambda>
+        <nlos_prob>0.1</nlos_prob>
+        <topic>/uwb/rear/range_1</topic>
+        <research_topic>/uwb/rear/research_data</research_topic>
+        <frame_id>uwb_anchor_1</frame_id>
+      </plugin>
+      <plugin filename="libUWBPlugin.so" name="ros2_uwb_research_sim::UWBPlugin">
+        <host_link>rear_tag</host_link>
+        <target_entity>uwb_anchor_2</target_entity>
+        <target_position>5 -5 2</target_position>
+        <update_rate>20.0</update_rate>
+        <gaussian_std>0.02</gaussian_std>
+        <nlos_lambda>1.5</nlos_lambda>
+        <nlos_prob>0.1</nlos_prob>
+        <topic>/uwb/rear/range_2</topic>
+        <research_topic>/uwb/rear/research_data</research_topic>
+        <frame_id>uwb_anchor_2</frame_id>
+      </plugin>
+      <plugin filename="libUWBPlugin.so" name="ros2_uwb_research_sim::UWBPlugin">
+        <host_link>rear_tag</host_link>
+        <target_entity>uwb_anchor_3</target_entity>
+        <target_position>-5 -5 2</target_position>
+        <update_rate>20.0</update_rate>
+        <gaussian_std>0.02</gaussian_std>
+        <nlos_lambda>1.5</nlos_lambda>
+        <nlos_prob>0.1</nlos_prob>
+        <topic>/uwb/rear/range_3</topic>
+        <research_topic>/uwb/rear/research_data</research_topic>
         <frame_id>uwb_anchor_3</frame_id>
       </plugin>
     </model>
